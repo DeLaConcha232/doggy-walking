@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin, ArrowLeft, Loader2, Clock } from "lucide-react";
 import { toast } from "sonner";
+import WalkMap from "@/components/WalkMap";
+import "leaflet/dist/leaflet.css";
 
 interface Location {
   id: string;
@@ -178,26 +180,23 @@ const WalkTracking = () => {
           </CardContent>
         </Card>
 
-        {/* Map Placeholder */}
-        <Card className="mb-6 overflow-hidden animate-fade-in border-border/50">
-          <div className="aspect-video bg-muted relative flex items-center justify-center">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-primary-glow/5" />
-            <div className="relative text-center p-6">
-              <MapPin className="h-12 w-12 mx-auto mb-4 text-primary animate-pulse" />
-              <p className="text-muted-foreground mb-2">Mapa de seguimiento</p>
-              <p className="text-sm text-muted-foreground">
-                Integración con Google Maps próximamente
-              </p>
-              {locations.length > 0 && (
-                <div className="mt-4 p-3 bg-card rounded-lg shadow-sm">
-                  <p className="text-xs text-muted-foreground mb-1">Última ubicación</p>
-                  <p className="text-sm font-mono">
-                    {locations[0].latitude.toFixed(6)}, {locations[0].longitude.toFixed(6)}
+        {/* Map */}
+        <Card className="mb-6 overflow-hidden animate-fade-in border-border/50 p-0">
+          <CardContent className="p-0">
+            {locations.length > 0 ? (
+              <WalkMap locations={locations} />
+            ) : (
+              <div className="aspect-video bg-muted relative flex items-center justify-center">
+                <div className="text-center p-6">
+                  <MapPin className="h-12 w-12 mx-auto mb-4 text-primary animate-pulse" />
+                  <p className="text-muted-foreground mb-2">Esperando ubicación...</p>
+                  <p className="text-sm text-muted-foreground">
+                    El mapa se mostrará cuando haya datos de ubicación
                   </p>
                 </div>
-              )}
-            </div>
-          </div>
+              </div>
+            )}
+          </CardContent>
         </Card>
 
         {/* Location History */}

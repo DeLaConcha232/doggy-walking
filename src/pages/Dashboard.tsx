@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { MapPin, LogOut, QrCode, Clock, Loader2, User as UserIcon } from "lucide-react";
+import { MapPin, LogOut, QrCode, Clock, Loader2, UserIcon, PlusCircle } from "lucide-react";
 import { toast } from "sonner";
 import type { User } from "@supabase/supabase-js";
 
@@ -136,7 +136,7 @@ const Dashboard = () => {
         </div>
 
         {/* Quick Actions */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card 
             className="cursor-pointer hover:shadow-lg transition-all animate-scale-in border-border/50"
             onClick={() => navigate("/scan-qr")}
@@ -147,35 +147,55 @@ const Dashboard = () => {
               </div>
               <CardTitle>Escanear QR</CardTitle>
               <CardDescription>
-                Comienza a seguir un paseo
-              </CardDescription>
-            </CardHeader>
-          </Card>
-
-          <Card className="cursor-pointer hover:shadow-lg transition-all animate-scale-in border-border/50" style={{ animationDelay: "0.1s" }}>
-            <CardHeader>
-              <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-2">
-                <MapPin className="h-6 w-6 text-primary" />
-              </div>
-              <CardTitle>Mis Paseos</CardTitle>
-              <CardDescription>
-                {walks.length} paseos registrados
+                Iniciar un paseo
               </CardDescription>
             </CardHeader>
           </Card>
 
           <Card 
             className="cursor-pointer hover:shadow-lg transition-all animate-scale-in border-border/50" 
-            style={{ animationDelay: "0.2s" }}
+            style={{ animationDelay: "0.05s" }}
+            onClick={() => navigate("/generate-qr")}
+          >
+            <CardHeader>
+              <div className="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center mb-2">
+                <PlusCircle className="h-6 w-6 text-green-500" />
+              </div>
+              <CardTitle>Generar QR</CardTitle>
+              <CardDescription>
+                Crear nuevo paseo
+              </CardDescription>
+            </CardHeader>
+          </Card>
+
+          <Card 
+            className="cursor-pointer hover:shadow-lg transition-all animate-scale-in border-border/50" 
+            style={{ animationDelay: "0.1s" }}
+            onClick={() => navigate("/my-walks")}
+          >
+            <CardHeader>
+              <div className="w-12 h-12 bg-secondary/10 rounded-xl flex items-center justify-center mb-2">
+                <MapPin className="h-6 w-6 text-secondary" />
+              </div>
+              <CardTitle>Mis Paseos</CardTitle>
+              <CardDescription>
+                {walks.length} registrados
+              </CardDescription>
+            </CardHeader>
+          </Card>
+
+          <Card 
+            className="cursor-pointer hover:shadow-lg transition-all animate-scale-in border-border/50" 
+            style={{ animationDelay: "0.15s" }}
             onClick={() => navigate("/profile")}
           >
             <CardHeader>
-              <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-2">
-                <UserIcon className="h-6 w-6 text-primary" />
+              <div className="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center mb-2">
+                <UserIcon className="h-6 w-6 text-accent" />
               </div>
               <CardTitle>Mi Perfil</CardTitle>
               <CardDescription>
-                Ver y editar información
+                Configuración
               </CardDescription>
             </CardHeader>
           </Card>
