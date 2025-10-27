@@ -15,7 +15,7 @@ const ScanQR = () => {
   const [manualCode, setManualCode] = useState('');
   const [processing, setProcessing] = useState(false);
 
-  const startWalk = async (code: string) => {
+  const handleAffiliation = async (code: string) => {
     setProcessing(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -27,9 +27,10 @@ const ScanQR = () => {
       // Verify QR code
       const { data: qrData, error: qrError } = await supabase
         .from('qr_codes')
-        .select('*, walks(*)')
+        .select('*')
         .eq('code', code)
         .eq('is_active', true)
+        .eq('code_type', 'affiliation')
         .single();
 
       if (qrError || !qrData) {
@@ -37,31 +38,42 @@ const ScanQR = () => {
         return;
       }
 
-      // Check if walk exists and update it
-      if (qrData.walk_id) {
-        const { error: updateError } = await supabase
-          .from('walks')
-          .update({
-            walker_id: user.id,
-            status: 'active',
-            start_time: new Date().toISOString()
-          })
-          .eq('id', qrData.walk_id);
+      // Check if already affiliated
+      const { data: existingAffiliation } = await supabase
+        .from('affiliations')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('admin_id', qrData.admin_id)
+        .single();
 
-        if (updateError) throw updateError;
-
-        // Deactivate QR code
-        await supabase
-          .from('qr_codes')
-          .update({ is_active: false })
-          .eq('id', qrData.id);
-
-        toast.success('Paseo iniciado correctamente');
-        navigate(`/walk/${qrData.walk_id}`);
+      if (existingAffiliation) {
+        toast.info('Ya estás afiliado a este administrador');
+        navigate('/dashboard');
+        return;
       }
+
+      // Create affiliation
+      const { error: affiliationError } = await supabase
+        .from('affiliations')
+        .insert({
+          user_id: user.id,
+          admin_id: qrData.admin_id,
+          is_active: true
+        });
+
+      if (affiliationError) throw affiliationError;
+
+      // Deactivate QR code (optional - can be reused)
+      await supabase
+        .from('qr_codes')
+        .update({ is_active: false })
+        .eq('id', qrData.id);
+
+      toast.success('¡Afiliación exitosa! Ahora puedes ver la ubicación en tiempo real');
+      navigate('/dashboard');
     } catch (error) {
-      console.error('Error starting walk:', error);
-      toast.error('Error al iniciar el paseo');
+      console.error('Error during affiliation:', error);
+      toast.error('Error al procesar la afiliación');
     } finally {
       setProcessing(false);
     }
@@ -70,7 +82,7 @@ const ScanQR = () => {
   const handleManualSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (manualCode.trim()) {
-      startWalk(manualCode.trim());
+      handleAffiliation(manualCode.trim());
     }
   };
 
@@ -88,7 +100,7 @@ const ScanQR = () => {
         (decodedText) => {
           html5QrCode.stop();
           setScanning(false);
-          startWalk(decodedText);
+          handleAffiliation(decodedText);
         },
         (errorMessage) => {
           // Silent errors while scanning
@@ -127,9 +139,9 @@ const ScanQR = () => {
               <div className="h-20 w-20 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center mx-auto mb-4">
                 <QrCode className="h-10 w-10 text-primary-foreground" />
               </div>
-              <h2 className="text-2xl font-bold mb-2">Escanea el código QR</h2>
+              <h2 className="text-2xl font-bold mb-2">Escanea el código de afiliación</h2>
               <p className="text-muted-foreground">
-                Escanea el código proporcionado por el dueño o ingrésalo manualmente
+                Escanea el código QR proporcionado por el administrador para afiliarte
               </p>
             </div>
 
@@ -172,7 +184,7 @@ const ScanQR = () => {
                     disabled={!manualCode.trim() || processing}
                     className="w-full"
                   >
-                    {processing ? 'Procesando...' : 'Iniciar paseo'}
+                    {processing ? 'Procesando...' : 'Afiliarme'}
                   </Button>
                 </form>
               </>

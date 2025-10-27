@@ -14,6 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_locations: {
+        Row: {
+          admin_id: string
+          created_at: string | null
+          id: string
+          latitude: number
+          longitude: number
+          timestamp: string | null
+        }
+        Insert: {
+          admin_id: string
+          created_at?: string | null
+          id?: string
+          latitude: number
+          longitude: number
+          timestamp?: string | null
+        }
+        Update: {
+          admin_id?: string
+          created_at?: string | null
+          id?: string
+          latitude?: number
+          longitude?: number
+          timestamp?: string | null
+        }
+        Relationships: []
+      }
+      affiliations: {
+        Row: {
+          admin_id: string
+          affiliated_at: string | null
+          id: string
+          is_active: boolean | null
+          user_id: string
+        }
+        Insert: {
+          admin_id: string
+          affiliated_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          user_id: string
+        }
+        Update: {
+          admin_id?: string
+          affiliated_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       locations: {
         Row: {
           created_at: string | null
@@ -81,7 +132,9 @@ export type Database = {
       }
       qr_codes: {
         Row: {
+          admin_id: string | null
           code: string
+          code_type: string | null
           created_at: string | null
           created_by: string | null
           expires_at: string | null
@@ -90,7 +143,9 @@ export type Database = {
           walk_id: string | null
         }
         Insert: {
+          admin_id?: string | null
           code: string
+          code_type?: string | null
           created_at?: string | null
           created_by?: string | null
           expires_at?: string | null
@@ -99,7 +154,9 @@ export type Database = {
           walk_id?: string | null
         }
         Update: {
+          admin_id?: string | null
           code?: string
+          code_type?: string | null
           created_at?: string | null
           created_by?: string | null
           expires_at?: string | null
@@ -123,6 +180,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
       }
       walks: {
         Row: {
@@ -183,9 +261,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
+      app_role: "admin" | "user"
       walk_status: "pending" | "active" | "completed" | "cancelled"
     }
     CompositeTypes: {
@@ -314,6 +399,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: ["admin", "user"],
       walk_status: ["pending", "active", "completed", "cancelled"],
     },
   },

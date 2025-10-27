@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { MapPin, LogOut, QrCode, Clock, Loader2, UserIcon, PlusCircle } from "lucide-react";
 import { toast } from "sonner";
 import type { User } from "@supabase/supabase-js";
+import AdminTrackingMap from "@/components/AdminTrackingMap";
 
 interface WalkData {
   id: string;
@@ -19,6 +20,7 @@ const Dashboard = () => {
   const [user, setUser] = useState<User | null>(null);
   const [walks, setWalks] = useState<WalkData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isAffiliated, setIsAffiliated] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,6 +31,7 @@ const Dashboard = () => {
       } else {
         setUser(session.user);
         loadWalks(session.user.id);
+        checkAffiliation(session.user.id);
       }
     });
 
@@ -42,6 +45,23 @@ const Dashboard = () => {
 
     return () => subscription.unsubscribe();
   }, [navigate]);
+
+  const checkAffiliation = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('affiliations')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('is_active', true)
+        .single();
+
+      if (!error && data) {
+        setIsAffiliated(true);
+      }
+    } catch (error) {
+      console.error('Error checking affiliation:', error);
+    }
+  };
 
   const loadWalks = async (userId: string) => {
     try {
@@ -200,6 +220,24 @@ const Dashboard = () => {
             </CardHeader>
           </Card>
         </div>
+
+        {/* Real-time Tracking Map */}
+        {isAffiliated && (
+          <Card className="animate-fade-in border-border/50 mb-8">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MapPin className="h-5 w-5" />
+                Ubicación en Tiempo Real
+              </CardTitle>
+              <CardDescription>
+                Seguimiento de la ubicación del administrador
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <AdminTrackingMap />
+            </CardContent>
+          </Card>
+        )}
 
         {/* Recent Walks */}
         <Card className="animate-fade-in border-border/50">
