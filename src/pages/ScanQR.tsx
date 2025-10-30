@@ -87,29 +87,52 @@ const ScanQR = () => {
   };
 
   const startScanning = async () => {
-    setScanning(true);
     try {
-      const html5QrCode = new Html5Qrcode("qr-reader");
+      setScanning(true);
       
+      // Request camera permissions first by getting available cameras
+      const cameras = await Html5Qrcode.getCameras();
+      if (!cameras || cameras.length === 0) {
+        throw new Error("No se encontraron cámaras disponibles");
+      }
+
+      // Use the back camera (usually last in list) or first available
+      const cameraId = cameras.length > 1 ? cameras[cameras.length - 1].id : cameras[0].id;
+      
+      const html5QrCode = new Html5Qrcode("qr-reader");
+
       await html5QrCode.start(
-        { facingMode: "environment" },
+        cameraId,
         {
           fps: 10,
           qrbox: { width: 250, height: 250 }
         },
         (decodedText) => {
-          html5QrCode.stop();
-          setScanning(false);
-          handleAffiliation(decodedText);
+          html5QrCode.stop().then(() => {
+            setScanning(false);
+            handleAffiliation(decodedText);
+          }).catch(err => {
+            console.error("Error stopping scanner:", err);
+            setScanning(false);
+            handleAffiliation(decodedText);
+          });
         },
         (errorMessage) => {
-          // Silent errors while scanning
+          // This is normal - fires when no QR code is detected in frame
+          console.log(errorMessage);
         }
       );
-    } catch (error) {
-      console.error('Error starting scanner:', error);
-      toast.error('No se pudo acceder a la cámara');
+    } catch (err: any) {
+      console.error("Error starting scanner:", err);
       setScanning(false);
+      
+      if (err.name === 'NotAllowedError' || err.message.includes('Permission')) {
+        toast.error("Permiso de cámara denegado. Por favor, permite el acceso a la cámara en la configuración de tu navegador.");
+      } else if (err.message.includes("cámara")) {
+        toast.error(err.message);
+      } else {
+        toast.error("No se pudo acceder a la cámara. Verifica los permisos en tu navegador.");
+      }
     }
   };
 
