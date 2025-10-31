@@ -21,6 +21,7 @@ const Dashboard = () => {
   const [walks, setWalks] = useState<WalkData[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAffiliated, setIsAffiliated] = useState(false);
+  const [hasActiveWalk, setHasActiveWalk] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -74,6 +75,10 @@ const Dashboard = () => {
 
       if (error) throw error;
       setWalks(data || []);
+      
+      // Check if there's an active walk
+      const activeWalk = data?.find(walk => walk.status === 'active');
+      setHasActiveWalk(!!activeWalk);
     } catch (error: any) {
       toast.error("Error al cargar paseos");
       console.error(error);
@@ -169,6 +174,12 @@ const Dashboard = () => {
               <CardDescription>
                 Iniciar un paseo
               </CardDescription>
+              {isAffiliated && (
+                <div className="mt-2 flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
+                  <div className="w-2 h-2 bg-green-600 dark:bg-green-400 rounded-full animate-pulse"></div>
+                  Conectado con tu paseador
+                </div>
+              )}
             </CardHeader>
           </Card>
 
@@ -206,8 +217,8 @@ const Dashboard = () => {
           </Card>
         </div>
 
-        {/* Real-time Tracking Map */}
-        {isAffiliated && (
+        {/* Real-time Tracking Map - Only show if affiliated AND has active walk */}
+        {isAffiliated && hasActiveWalk && (
           <Card className="animate-fade-in border-border/50 mb-8">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">

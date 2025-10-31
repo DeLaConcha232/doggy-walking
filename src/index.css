@@ -61,6 +61,50 @@ All colors MUST be HSL.
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-spring: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   }
+
+  .dark {
+    /* Dark Mode Colors */
+    --background: 222 15% 10%;
+    --foreground: 210 40% 96%;
+
+    --card: 222 15% 13%;
+    --card-foreground: 210 40% 96%;
+
+    --popover: 222 15% 13%;
+    --popover-foreground: 210 40% 96%;
+
+    /* Primary: Premium Blue (brighter for dark mode) */
+    --primary: 217 91% 65%;
+    --primary-foreground: 222 15% 10%;
+    --primary-hover: 217 91% 70%;
+    --primary-glow: 217 91% 75%;
+
+    /* Secondary: Dark Slate */
+    --secondary: 217 15% 20%;
+    --secondary-foreground: 210 40% 96%;
+
+    /* Muted: Subtle dark backgrounds */
+    --muted: 217 15% 18%;
+    --muted-foreground: 215 15% 60%;
+
+    /* Accent: Dark blue */
+    --accent: 217 15% 20%;
+    --accent-foreground: 217 91% 65%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 96%;
+
+    --border: 217 15% 25%;
+    --input: 217 15% 25%;
+    --ring: 217 91% 65%;
+
+    /* Dark mode shadows */
+    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.3);
+    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.3), 0 2px 4px -2px hsl(0 0% 0% / 0.3);
+    --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.3), 0 4px 6px -4px hsl(0 0% 0% / 0.3);
+    --shadow-glow: 0 0 30px hsl(217 91% 65% / 0.4);
+    --shadow-card: 0 4px 16px hsl(0 0% 0% / 0.2);
+  }
 }
 
 @layer base {

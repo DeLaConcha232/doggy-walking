@@ -1,15 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTheme } from 'next-themes';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
-import { ArrowLeft, User as UserIcon, Mail, Phone, Save } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ArrowLeft, User as UserIcon, Mail, Phone, Save, Moon, Sun, Monitor } from 'lucide-react';
 import { toast } from 'sonner';
 
 const Profile = () => {
   const navigate = useNavigate();
+  const { theme, setTheme } = useTheme();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [profile, setProfile] = useState({
@@ -158,6 +161,38 @@ const Profile = () => {
                   onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
                   placeholder="+34 600 000 000"
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="theme" className="flex items-center gap-2">
+                  {theme === 'dark' ? <Moon className="h-4 w-4" /> : theme === 'light' ? <Sun className="h-4 w-4" /> : <Monitor className="h-4 w-4" />}
+                  Tema
+                </Label>
+                <Select value={theme} onValueChange={setTheme}>
+                  <SelectTrigger id="theme">
+                    <SelectValue placeholder="Selecciona un tema" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="light">
+                      <div className="flex items-center gap-2">
+                        <Sun className="h-4 w-4" />
+                        <span>Claro</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="dark">
+                      <div className="flex items-center gap-2">
+                        <Moon className="h-4 w-4" />
+                        <span>Oscuro</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="system">
+                      <div className="flex items-center gap-2">
+                        <Monitor className="h-4 w-4" />
+                        <span>Sistema</span>
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
