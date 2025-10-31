@@ -24,14 +24,12 @@ const ScanQR = () => {
         return;
       }
 
-      // Verify QR code
+      // Verify QR code from admin_qr_codes table
       const { data: qrData, error: qrError } = await supabase
-        .from('qr_codes')
+        .from('admin_qr_codes' as any)
         .select('*')
         .eq('code', code)
-        .eq('is_active', true)
-        .eq('code_type', 'affiliation')
-        .single();
+        .single() as any;
 
       if (qrError || !qrData) {
         toast.error('Código QR inválido o expirado');
@@ -43,8 +41,8 @@ const ScanQR = () => {
         .from('affiliations')
         .select('*')
         .eq('user_id', user.id)
-        .eq('admin_id', qrData.admin_id)
-        .single();
+        .eq('admin_id', qrData.admin_id as string)
+        .maybeSingle();
 
       if (existingAffiliation) {
         toast.info('Ya estás afiliado a este administrador');
@@ -57,17 +55,11 @@ const ScanQR = () => {
         .from('affiliations')
         .insert({
           user_id: user.id,
-          admin_id: qrData.admin_id,
+          admin_id: qrData.admin_id as string,
           is_active: true
         });
 
       if (affiliationError) throw affiliationError;
-
-      // Deactivate QR code (optional - can be reused)
-      await supabase
-        .from('qr_codes')
-        .update({ is_active: false })
-        .eq('id', qrData.id);
 
       toast.success('¡Afiliación exitosa! Ahora puedes ver la ubicación en tiempo real');
       navigate('/dashboard');
