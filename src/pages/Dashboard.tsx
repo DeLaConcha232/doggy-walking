@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { MapPin, LogOut, QrCode, Clock, Loader2, UserIcon } from "lucide-react";
+import { MapPin, LogOut, QrCode, Clock, Loader2, UserIcon, Heart } from "lucide-react";
 import { toast } from "sonner";
 import type { User } from "@supabase/supabase-js";
 import AdminTrackingMap from "@/components/AdminTrackingMap";
@@ -75,7 +75,7 @@ const Dashboard = () => {
 
       if (error) throw error;
       setWalks(data || []);
-      
+
       // Check if there's an active walk
       const activeWalk = data?.find(walk => walk.status === 'active');
       setHasActiveWalk(!!activeWalk);
@@ -162,7 +162,7 @@ const Dashboard = () => {
 
         {/* Quick Actions */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          <Card 
+          <Card
             className="cursor-pointer hover:shadow-lg transition-all animate-scale-in border-border/50"
             onClick={() => navigate("/scan-qr")}
           >
@@ -184,8 +184,8 @@ const Dashboard = () => {
           </Card>
 
 
-          <Card 
-            className="cursor-pointer hover:shadow-lg transition-all animate-scale-in border-border/50" 
+          <Card
+            className="cursor-pointer hover:shadow-lg transition-all animate-scale-in border-border/50"
             style={{ animationDelay: "0.1s" }}
             onClick={() => navigate("/my-walks")}
           >
@@ -200,8 +200,8 @@ const Dashboard = () => {
             </CardHeader>
           </Card>
 
-          <Card 
-            className="cursor-pointer hover:shadow-lg transition-all animate-scale-in border-border/50" 
+          <Card
+            className="cursor-pointer hover:shadow-lg transition-all animate-scale-in border-border/50"
             style={{ animationDelay: "0.15s" }}
             onClick={() => navigate("/profile")}
           >
@@ -290,6 +290,7 @@ const Dashboard = () => {
             )}
           </CardContent>
         </Card>
+        <a href='https://www.avskallet.com/' className='mt-4 text-center text-sm text-blue-500 flex justify-center items-center cursor-pointer'>Hecho con <Heart className="inline-block w-4 h-4 mx-1" /> por av-skallet solutions</a>
       </div>
     </div>
   );
