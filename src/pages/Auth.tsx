@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { toast } from "sonner";
 import { MapPin, Loader2 } from "lucide-react";
 import { z } from "zod";
+import PWAInstallInstructions from "@/components/PWAInstallInstructions";
 
 const authSchema = z.object({
   email: z.string().email("Email inválido").max(255),
@@ -180,7 +181,7 @@ const Auth = () => {
             </Button>
           </form>
 
-          <div className="mt-6 text-center">
+          <div className="mt-6 text-center space-y-3">
             <button
               type="button"
               onClick={() => setIsLogin(!isLogin)}
@@ -190,6 +191,10 @@ const Auth = () => {
                 ? "¿No tienes cuenta? Regístrate"
                 : "¿Ya tienes cuenta? Inicia sesión"}
             </button>
+            
+            <div className="pt-2 border-t border-border/30">
+              <PWAInstallInstructions />
+            </div>
           </div>
         </CardContent>
       </Card>
