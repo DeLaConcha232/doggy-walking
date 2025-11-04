@@ -67,7 +67,6 @@ const WalkTracking = () => {
       }
     } catch (error: any) {
       toast.error("Error al cargar datos del paseo");
-      console.error(error);
     } finally {
       setLoading(false);
     }

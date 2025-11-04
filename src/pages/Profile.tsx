@@ -49,7 +49,6 @@ const Profile = () => {
         });
       }
     } catch (error) {
-      console.error('Error loading profile:', error);
       toast.error('Error al cargar el perfil');
     } finally {
       setLoading(false);
@@ -74,7 +73,6 @@ const Profile = () => {
       
       toast.success('Perfil actualizado correctamente');
     } catch (error) {
-      console.error('Error saving profile:', error);
       toast.error('Error al guardar el perfil');
     } finally {
       setSaving(false);

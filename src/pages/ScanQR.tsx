@@ -8,6 +8,12 @@ import { Label } from '@/components/ui/label';
 import { ArrowLeft, QrCode } from 'lucide-react';
 import { toast } from 'sonner';
 import { Html5Qrcode } from 'html5-qrcode';
+import { z } from 'zod';
+
+// QR code validation schema
+const qrCodeSchema = z.object({
+  code: z.string().trim().min(1, 'El código no puede estar vacío').max(100, 'El código es demasiado largo').regex(/^[A-Za-z0-9-_]+$/, 'El código contiene caracteres inválidos')
+});
 
 const ScanQR = () => {
   const navigate = useNavigate();
@@ -18,6 +24,13 @@ const ScanQR = () => {
   const handleAffiliation = async (code: string) => {
     setProcessing(true);
     try {
+      // Validate input
+      const validation = qrCodeSchema.safeParse({ code });
+      if (!validation.success) {
+        toast.error(validation.error.errors[0].message);
+        return;
+      }
+
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         navigate('/');
@@ -64,7 +77,6 @@ const ScanQR = () => {
       toast.success('¡Afiliación exitosa! Ahora puedes ver la ubicación en tiempo real');
       navigate('/dashboard');
     } catch (error) {
-      console.error('Error during affiliation:', error);
       toast.error('Error al procesar la afiliación');
     } finally {
       setProcessing(false);
@@ -115,7 +127,6 @@ const ScanQR = () => {
         }
       );
     } catch (err: any) {
-      console.error("Error starting scanner:", err);
       setScanning(false);
       
       if (err.name === 'NotAllowedError' || err.message.includes('Permission')) {

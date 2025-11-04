@@ -81,7 +81,6 @@ const Dashboard = () => {
       setHasActiveWalk(!!activeWalk);
     } catch (error: any) {
       toast.error("Error al cargar paseos");
-      console.error(error);
     } finally {
       setLoading(false);
     }
