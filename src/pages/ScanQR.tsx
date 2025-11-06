@@ -39,10 +39,10 @@ const ScanQR = () => {
 
       // Verify QR code from admin_qr_codes table
       const { data: qrData, error: qrError } = await supabase
-        .from('admin_qr_codes' as any)
+        .from('admin_qr_codes')
         .select('*')
         .eq('code', code)
-        .single() as any;
+        .single();
 
       if (qrError || !qrData) {
         toast.error('Código QR inválido o expirado');
@@ -53,8 +53,8 @@ const ScanQR = () => {
       const { data: existingAffiliation } = await supabase
         .from('affiliations')
         .select('*')
-        .eq('user_id', user.id)
-        .eq('admin_id', qrData.admin_id as string)
+  .eq('user_id', user.id)
+  .eq('admin_id', qrData.admin_id)
         .maybeSingle();
 
       if (existingAffiliation) {
@@ -68,7 +68,7 @@ const ScanQR = () => {
         .from('affiliations')
         .insert({
           user_id: user.id,
-          admin_id: qrData.admin_id as string,
+          admin_id: qrData.admin_id,
           is_active: true
         });
 
@@ -94,8 +94,9 @@ const ScanQR = () => {
     try {
       setScanning(true);
       
-      // Request camera permissions first by getting available cameras
-      const cameras = await Html5Qrcode.getCameras();
+  const { Html5Qrcode } = await import('html5-qrcode');
+  // Request camera permissions first by getting available cameras
+  const cameras = await Html5Qrcode.getCameras();
       if (!cameras || cameras.length === 0) {
         throw new Error("No se encontraron cámaras disponibles");
       }
@@ -103,7 +104,7 @@ const ScanQR = () => {
       // Use the back camera (usually last in list) or first available
       const cameraId = cameras.length > 1 ? cameras[cameras.length - 1].id : cameras[0].id;
       
-      const html5QrCode = new Html5Qrcode("qr-reader");
+  const html5QrCode = new Html5Qrcode("qr-reader");
 
       await html5QrCode.start(
         cameraId,
@@ -126,13 +127,14 @@ const ScanQR = () => {
           console.log(errorMessage);
         }
       );
-    } catch (err: any) {
+    } catch (err: unknown) {
       setScanning(false);
       
-      if (err.name === 'NotAllowedError' || err.message.includes('Permission')) {
+      const e = err as { name?: string; message?: string };
+      if (e?.name === 'NotAllowedError' || (typeof e.message === 'string' && e.message.includes('Permission'))) {
         toast.error("Permiso de cámara denegado. Por favor, permite el acceso a la cámara en la configuración de tu navegador.");
-      } else if (err.message.includes("cámara")) {
-        toast.error(err.message);
+      } else if (typeof e.message === 'string' && e.message.includes("cámara")) {
+        toast.error(e.message);
       } else {
         toast.error("No se pudo acceder a la cámara. Verifica los permisos en tu navegador.");
       }

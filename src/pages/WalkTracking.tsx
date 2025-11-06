@@ -1,11 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin, ArrowLeft, Loader2, Clock } from "lucide-react";
 import { toast } from "sonner";
-import WalkMap from "@/components/WalkMap";
+import { Suspense, lazy } from "react";
+const WalkMap = lazy(() => import("@/components/WalkMap"));
 import "leaflet/dist/leaflet.css";
 
 interface Location {
@@ -30,17 +31,7 @@ const WalkTracking = () => {
   const [loading, setLoading] = useState(true);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
 
-  useEffect(() => {
-    if (!walkId) {
-      navigate("/dashboard");
-      return;
-    }
-
-    loadWalkData();
-    subscribeToLocationUpdates();
-  }, [walkId, navigate]);
-
-  const loadWalkData = async () => {
+  const loadWalkData = useCallback(async () => {
     try {
       // Load walk info
       const { data: walkData, error: walkError } = await supabase
@@ -65,14 +56,15 @@ const WalkTracking = () => {
       if (locationData && locationData.length > 0) {
         setLastUpdate(new Date(locationData[0].timestamp));
       }
-    } catch (error: any) {
+    } catch (err: unknown) {
+      console.error(err);
       toast.error("Error al cargar datos del paseo");
     } finally {
       setLoading(false);
     }
-  };
+  }, [walkId]);
 
-  const subscribeToLocationUpdates = () => {
+  const subscribeToLocationUpdates = useCallback(() => {
     const channel = supabase
       .channel("location-updates")
       .on(
@@ -95,7 +87,18 @@ const WalkTracking = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  };
+  }, [walkId]);
+
+  useEffect(() => {
+    if (!walkId) {
+      navigate("/dashboard");
+      return;
+    }
+
+    loadWalkData();
+    const unsubscribe = subscribeToLocationUpdates();
+    return unsubscribe;
+  }, [walkId, navigate, loadWalkData, subscribeToLocationUpdates]);
 
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString("es-ES", {
@@ -183,7 +186,9 @@ const WalkTracking = () => {
         <Card className="mb-6 overflow-hidden animate-fade-in border-border/50 p-0">
           <CardContent className="p-0">
             {locations.length > 0 ? (
-              <WalkMap locations={locations} />
+              <Suspense fallback={<div className="aspect-video bg-muted animate-pulse" /> }>
+                <WalkMap locations={locations} />
+              </Suspense>
             ) : (
               <div className="aspect-video bg-muted relative flex items-center justify-center">
                 <div className="text-center p-6">

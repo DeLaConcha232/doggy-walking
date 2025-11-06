@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -21,11 +21,7 @@ const MyWalks = () => {
   const [loading, setLoading] = useState(true);
   const [walks, setWalks] = useState<Walk[]>([]);
 
-  useEffect(() => {
-    loadWalks();
-  }, []);
-
-  const loadWalks = async () => {
+  const loadWalks = useCallback(async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
@@ -47,7 +43,11 @@ const MyWalks = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [navigate]);
+
+  useEffect(() => {
+    loadWalks();
+  }, [loadWalks]);
 
   const getStatusColor = (status: string) => {
     switch (status) {

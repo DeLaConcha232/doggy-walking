@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { supabase } from '@/integrations/supabase/client';
 
 // Fix for default marker icons
-delete (L.Icon.Default.prototype as any)._getIconUrl;
+// Avoid using `any` to satisfy ESLint rule - cast via unknown
+delete (L.Icon.Default.prototype as unknown as { _getIconUrl?: unknown })._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
   iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
@@ -25,6 +26,25 @@ const AdminTrackingMap = () => {
   const markerRef = useRef<L.Marker | null>(null);
   const [lastLocation, setLastLocation] = useState<AdminLocation | null>(null);
 
+  const loadLatestLocation = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from('admin_locations')
+        .select('*')
+        .order('timestamp', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (error) throw error;
+      if (data) {
+        setLastLocation(data);
+        updateMarker(data);
+      }
+    } catch (error) {
+      console.error('Error loading location:', error);
+    }
+  }, []);
+
   useEffect(() => {
     if (!mapContainerRef.current) return;
 
@@ -36,8 +56,8 @@ const AdminTrackingMap = () => {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(mapRef.current);
 
-    // Load initial location
-    loadLatestLocation();
+  // Load initial location
+  loadLatestLocation();
 
     // Subscribe to real-time updates
     const channel = supabase
@@ -64,26 +84,7 @@ const AdminTrackingMap = () => {
       }
       supabase.removeChannel(channel);
     };
-  }, []);
-
-  const loadLatestLocation = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('admin_locations')
-        .select('*')
-        .order('timestamp', { ascending: false })
-        .limit(1)
-        .single();
-
-      if (error) throw error;
-      if (data) {
-        setLastLocation(data);
-        updateMarker(data);
-      }
-    } catch (error) {
-      console.error('Error loading location:', error);
-    }
-  };
+  }, [loadLatestLocation]);
 
   const updateMarker = (location: AdminLocation) => {
     if (!mapRef.current) return;

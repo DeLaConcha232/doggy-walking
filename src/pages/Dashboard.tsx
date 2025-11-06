@@ -6,7 +6,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { MapPin, LogOut, QrCode, Clock, Loader2, UserIcon, Heart } from "lucide-react";
 import { toast } from "sonner";
 import type { User } from "@supabase/supabase-js";
-import AdminTrackingMap from "@/components/AdminTrackingMap";
+import { Suspense, lazy } from "react";
+const AdminTrackingMap = lazy(() => import("@/components/AdminTrackingMap"));
+import iconLogo from '/icon-192.png';
 
 interface WalkData {
   id: string;
@@ -79,7 +81,8 @@ const Dashboard = () => {
       // Check if there's an active walk
       const activeWalk = data?.find(walk => walk.status === 'active');
       setHasActiveWalk(!!activeWalk);
-    } catch (error: any) {
+    } catch (err: unknown) {
+      console.error(err);
       toast.error("Error al cargar paseos");
     } finally {
       setLoading(false);
@@ -91,7 +94,8 @@ const Dashboard = () => {
       await supabase.auth.signOut();
       toast.success("Sesión cerrada");
       navigate("/auth");
-    } catch (error: any) {
+    } catch (err: unknown) {
+      console.error(err);
       toast.error("Error al cerrar sesión");
     }
   };
@@ -138,8 +142,8 @@ const Dashboard = () => {
       <nav className="border-b bg-card">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <MapPin className="h-6 w-6 text-primary" />
-            <span className="text-xl font-bold">BarkPath</span>
+            <img src={iconLogo} alt="Doggy-Walking" className="h-6 w-6 rounded-sm" />
+            <span className="text-xl font-bold">Doggy-Walking</span>
           </div>
           <Button variant="ghost" size="sm" onClick={handleLogout}>
             <LogOut className="h-4 w-4 mr-2" />
@@ -183,7 +187,7 @@ const Dashboard = () => {
           </Card>
 
 
-          <Card
+          {/* <Card
             className="cursor-pointer hover:shadow-lg transition-all animate-scale-in border-border/50"
             style={{ animationDelay: "0.1s" }}
             onClick={() => navigate("/my-walks")}
@@ -197,7 +201,7 @@ const Dashboard = () => {
                 {walks.length} registrados
               </CardDescription>
             </CardHeader>
-          </Card>
+          </Card> */}
 
           <Card
             className="cursor-pointer hover:shadow-lg transition-all animate-scale-in border-border/50"
@@ -229,13 +233,15 @@ const Dashboard = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <AdminTrackingMap />
+              <Suspense fallback={<div className="h-[400px] w-full rounded-lg bg-muted animate-pulse" /> }>
+                <AdminTrackingMap />
+              </Suspense>
             </CardContent>
           </Card>
         )}
 
         {/* Recent Walks */}
-        <Card className="animate-fade-in border-border/50">
+        {/* <Card className="animate-fade-in border-border/50">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Clock className="h-5 w-5" />
@@ -288,7 +294,7 @@ const Dashboard = () => {
               </div>
             )}
           </CardContent>
-        </Card>
+        </Card> */}
         <a href='https://www.avskallet.com/' className='mt-4 text-center text-sm text-blue-500 flex justify-center items-center cursor-pointer'>Hecho con <Heart className="inline-block w-4 h-4 mx-1" /> por av-skallet solutions</a>
       </div>
     </div>

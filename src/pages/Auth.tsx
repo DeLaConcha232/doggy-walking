@@ -84,13 +84,13 @@ const Auth = () => {
         if (error) throw error;
         toast.success("¡Cuenta creada! Revisa tu email para confirmar.");
       }
-    } catch (error: any) {
-      if (error instanceof z.ZodError) {
-        toast.error(error.errors[0].message);
-      } else if (error.message?.includes("already registered")) {
+    } catch (err: unknown) {
+      if (err instanceof z.ZodError) {
+        toast.error(err.errors[0].message);
+      } else if (typeof (err as Error).message === 'string' && (err as Error).message.includes("already registered")) {
         toast.error("Este email ya está registrado. Intenta iniciar sesión.");
       } else {
-        toast.error(error.message || "Error en la autenticación");
+        toast.error((err as Error).message || "Error en la autenticación");
       }
     } finally {
       setLoading(false);
