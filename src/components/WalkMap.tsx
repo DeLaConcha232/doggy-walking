@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, memo } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -22,7 +22,7 @@ interface WalkMapProps {
   locations: Location[];
 }
 
-const WalkMap = ({ locations }: WalkMapProps) => {
+const WalkMap = memo(({ locations }: WalkMapProps) => {
   const mapRef = useRef<L.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const markersLayerRef = useRef<L.LayerGroup | null>(null);
@@ -53,9 +53,9 @@ const WalkMap = ({ locations }: WalkMapProps) => {
         [Number(loc.latitude), Number(loc.longitude)]
       );
 
-      // Draw path
+      // Draw path with primary color
       L.polyline(latLngs, {
-        color: '#6366f1',
+        color: 'hsl(270, 60%, 65%)',
         weight: 4,
         opacity: 0.7
       }).addTo(markersLayerRef.current);
@@ -91,6 +91,8 @@ const WalkMap = ({ locations }: WalkMapProps) => {
       style={{ zIndex: 0 }}
     />
   );
-};
+});
+
+WalkMap.displayName = 'WalkMap';
 
 export default WalkMap;

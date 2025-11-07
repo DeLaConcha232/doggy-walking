@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback, memo } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { supabase } from '@/integrations/supabase/client';
@@ -20,7 +20,7 @@ interface AdminLocation {
   timestamp: string;
 }
 
-const AdminTrackingMap = () => {
+const AdminTrackingMap = memo(() => {
   const mapRef = useRef<L.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const markerRef = useRef<L.Marker | null>(null);
@@ -117,6 +117,8 @@ const AdminTrackingMap = () => {
       )}
     </div>
   );
-};
+});
+
+AdminTrackingMap.displayName = 'AdminTrackingMap';
 
 export default AdminTrackingMap;

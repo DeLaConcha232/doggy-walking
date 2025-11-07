@@ -18,23 +18,23 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 215 25% 12%;
 
-    /* Primary: Premium Blue */
-    --primary: 217 91% 100%;
+    /* Primary: Purple/Lilac from brand logo */
+    --primary: 270 60% 65%;
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 217 91% 55%;
-    --primary-glow: 217 91% 70%;
+    --primary-hover: 270 60% 55%;
+    --primary-glow: 280 70% 75%;
 
-    /* Secondary: Slate */
-    --secondary: 215 20% 96%;
-    --secondary-foreground: 215 25% 12%;
+    /* Secondary: Slate with purple tint */
+    --secondary: 260 15% 96%;
+    --secondary-foreground: 260 20% 12%;
 
-    /* Muted: Subtle backgrounds */
-    --muted: 215 15% 95%;
-    --muted-foreground: 215 15% 45%;
+    /* Muted: Subtle backgrounds with purple hint */
+    --muted: 260 10% 95%;
+    --muted-foreground: 260 10% 45%;
 
-    /* Accent: Light blue */
-    --accent: 210 40% 96%;
-    --accent-foreground: 217 91% 60%;
+    /* Accent: Deep purple */
+    --accent: 265 50% 96%;
+    --accent-foreground: 270 60% 60%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
@@ -45,17 +45,17 @@ All colors MUST be HSL.
 
     --radius: 0.75rem;
 
-    /* Custom gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(217 91% 60%), hsl(217 91% 70%));
-    --gradient-hero: linear-gradient(135deg, hsl(217 91% 60%) 0%, hsl(220 80% 65%) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(210 20% 98%) 100%);
+    /* Custom gradients with purple/lilac */
+    --gradient-primary: linear-gradient(135deg, hsl(270 60% 65%), hsl(280 70% 75%));
+    --gradient-hero: linear-gradient(135deg, hsl(270 60% 65%) 0%, hsl(260 50% 60%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(260 10% 98%) 100%);
 
-    /* Shadows */
-    --shadow-sm: 0 1px 2px 0 hsl(215 25% 12% / 0.05);
-    --shadow-md: 0 4px 6px -1px hsl(215 25% 12% / 0.1), 0 2px 4px -2px hsl(215 25% 12% / 0.1);
-    --shadow-lg: 0 10px 15px -3px hsl(215 25% 12% / 0.1), 0 4px 6px -4px hsl(215 25% 12% / 0.1);
-    --shadow-glow: 0 0 30px hsl(217 91% 60% / 0.3);
-    --shadow-card: 0 4px 16px hsl(215 25% 12% / 0.06);
+    /* Shadows with purple tint */
+    --shadow-sm: 0 1px 2px 0 hsl(260 25% 12% / 0.05);
+    --shadow-md: 0 4px 6px -1px hsl(260 25% 12% / 0.1), 0 2px 4px -2px hsl(260 25% 12% / 0.1);
+    --shadow-lg: 0 10px 15px -3px hsl(260 25% 12% / 0.1), 0 4px 6px -4px hsl(260 25% 12% / 0.1);
+    --shadow-glow: 0 0 30px hsl(270 60% 65% / 0.3);
+    --shadow-card: 0 4px 16px hsl(260 25% 12% / 0.06);
 
     /* Transitions */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -73,23 +73,23 @@ All colors MUST be HSL.
     --popover: 222 15% 13%;
     --popover-foreground: 210 40% 96%;
 
-    /* Primary: Premium Blue (brighter for dark mode) */
-    --primary: 217 91% 65%;
+    /* Primary: Vibrant purple for dark mode */
+    --primary: 270 60% 70%;
     --primary-foreground: 222 15% 10%;
-    --primary-hover: 217 91% 70%;
-    --primary-glow: 217 91% 75%;
+    --primary-hover: 270 60% 75%;
+    --primary-glow: 280 70% 80%;
 
-    /* Secondary: Dark Slate */
-    --secondary: 217 15% 20%;
-    --secondary-foreground: 210 40% 96%;
+    /* Secondary: Dark slate with purple tint */
+    --secondary: 260 12% 20%;
+    --secondary-foreground: 260 40% 96%;
 
-    /* Muted: Subtle dark backgrounds */
-    --muted: 217 15% 18%;
-    --muted-foreground: 215 15% 60%;
+    /* Muted: Subtle dark backgrounds with purple */
+    --muted: 260 12% 18%;
+    --muted-foreground: 260 12% 60%;
 
-    /* Accent: Dark blue */
-    --accent: 217 15% 20%;
-    --accent-foreground: 217 91% 65%;
+    /* Accent: Deep purple for dark mode */
+    --accent: 265 15% 20%;
+    --accent-foreground: 270 60% 70%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 96%;
@@ -98,11 +98,11 @@ All colors MUST be HSL.
     --input: 217 15% 25%;
     --ring: 217 91% 65%;
 
-    /* Dark mode shadows */
+    /* Dark mode shadows with purple glow */
     --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.3);
     --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.3), 0 2px 4px -2px hsl(0 0% 0% / 0.3);
     --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.3), 0 4px 6px -4px hsl(0 0% 0% / 0.3);
-    --shadow-glow: 0 0 30px hsl(217 91% 65% / 0.4);
+    --shadow-glow: 0 0 30px hsl(270 60% 70% / 0.4);
     --shadow-card: 0 4px 16px hsl(0 0% 0% / 0.2);
   }
 }
