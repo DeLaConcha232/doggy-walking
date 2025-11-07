@@ -220,8 +220,8 @@ const Dashboard = () => {
           </Card>
         </div>
 
-        {/* Real-time Tracking Map - Only show if affiliated AND has active walk */}
-        {isAffiliated && hasActiveWalk && (
+        {/* Real-time Tracking Map - Always show if affiliated */}
+        {isAffiliated && (
           <Card className="animate-fade-in border-border/50 mb-8">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -232,10 +232,23 @@ const Dashboard = () => {
                 Seguimiento de la ubicación del administrador
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="relative">
               <Suspense fallback={<div className="h-[400px] w-full rounded-lg bg-muted animate-pulse" /> }>
                 <AdminTrackingMap />
               </Suspense>
+              {!hasActiveWalk && (
+                <div className="absolute inset-0 backdrop-blur-sm bg-background/60 rounded-lg flex items-center justify-center">
+                  <div className="text-center space-y-2">
+                    <MapPin className="h-12 w-12 mx-auto text-muted-foreground opacity-50" />
+                    <p className="text-lg font-medium text-foreground">
+                      No hay paseo activo
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      El mapa se activará cuando comience un paseo
+                    </p>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         )}

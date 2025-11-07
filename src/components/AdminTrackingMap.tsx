@@ -26,6 +26,23 @@ const AdminTrackingMap = () => {
   const markerRef = useRef<L.Marker | null>(null);
   const [lastLocation, setLastLocation] = useState<AdminLocation | null>(null);
 
+  const updateMarker = useCallback((location: AdminLocation) => {
+    if (!mapRef.current) return;
+
+    const latLng: [number, number] = [Number(location.latitude), Number(location.longitude)];
+
+    if (markerRef.current) {
+      markerRef.current.setLatLng(latLng);
+      markerRef.current.setPopupContent(`Última actualización:<br/>${new Date(location.timestamp).toLocaleString('es-ES')}`);
+    } else {
+      markerRef.current = L.marker(latLng)
+        .bindPopup(`Última actualización:<br/>${new Date(location.timestamp).toLocaleString('es-ES')}`)
+        .addTo(mapRef.current);
+    }
+
+    mapRef.current.setView(latLng, 15);
+  }, []);
+
   const loadLatestLocation = useCallback(async () => {
     try {
       const { data, error } = await supabase
@@ -41,9 +58,9 @@ const AdminTrackingMap = () => {
         updateMarker(data);
       }
     } catch (error) {
-      console.error('Error loading location:', error);
+      // Silently fail if no locations yet
     }
-  }, []);
+  }, [updateMarker]);
 
   useEffect(() => {
     if (!mapContainerRef.current) return;
@@ -56,8 +73,8 @@ const AdminTrackingMap = () => {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(mapRef.current);
 
-  // Load initial location
-  loadLatestLocation();
+    // Load initial location
+    loadLatestLocation();
 
     // Subscribe to real-time updates
     const channel = supabase
@@ -84,23 +101,7 @@ const AdminTrackingMap = () => {
       }
       supabase.removeChannel(channel);
     };
-  }, [loadLatestLocation]);
-
-  const updateMarker = (location: AdminLocation) => {
-    if (!mapRef.current) return;
-
-    const latLng: [number, number] = [Number(location.latitude), Number(location.longitude)];
-
-    if (markerRef.current) {
-      markerRef.current.setLatLng(latLng);
-    } else {
-      markerRef.current = L.marker(latLng)
-        .bindPopup(`Última actualización:<br/>${new Date(location.timestamp).toLocaleString('es-ES')}`)
-        .addTo(mapRef.current);
-    }
-
-    mapRef.current.setView(latLng, 15);
-  };
+  }, [loadLatestLocation, updateMarker]);
 
   return (
     <div className="space-y-2">
