@@ -23,9 +23,10 @@ interface AdminLocation {
 
 interface AdminTrackingMapProps {
   adminId: string | null;
+  onLocationUpdate?: (hasLocation: boolean) => void;
 }
 
-const AdminTrackingMap = memo(({ adminId }: AdminTrackingMapProps) => {
+const AdminTrackingMap = memo(({ adminId, onLocationUpdate }: AdminTrackingMapProps) => {
   const mapRef = useRef<L.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const markerRef = useRef<L.Marker | null>(null);
@@ -65,6 +66,9 @@ const AdminTrackingMap = memo(({ adminId }: AdminTrackingMapProps) => {
       if (data) {
         setLastLocation(data);
         updateMarker(data);
+        onLocationUpdate?.(true);
+      } else {
+        onLocationUpdate?.(false);
       }
     } catch (error) {
       // Silently fail if no locations yet
@@ -101,6 +105,7 @@ const AdminTrackingMap = memo(({ adminId }: AdminTrackingMapProps) => {
           if (newLocation.is_active) {
             setLastLocation(newLocation);
             updateMarker(newLocation);
+            onLocationUpdate?.(true);
           }
         }
       )

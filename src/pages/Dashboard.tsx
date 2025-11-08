@@ -25,6 +25,7 @@ const Dashboard = () => {
   const [isAffiliated, setIsAffiliated] = useState(false);
   const [affiliatedAdminId, setAffiliatedAdminId] = useState<string | null>(null);
   const [hasActiveWalk, setHasActiveWalk] = useState(false);
+  const [hasAdminLocation, setHasAdminLocation] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -283,9 +284,12 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent className="relative">
               <Suspense fallback={<div className="h-[400px] w-full rounded-lg bg-muted animate-pulse" /> }>
-                <AdminTrackingMap adminId={affiliatedAdminId} />
+                <AdminTrackingMap 
+                  adminId={affiliatedAdminId} 
+                  onLocationUpdate={setHasAdminLocation}
+                />
               </Suspense>
-              {!hasActiveWalk && (
+              {!hasActiveWalk && !hasAdminLocation && (
                 <div className="absolute inset-0 backdrop-blur-sm bg-background/60 rounded-lg flex items-center justify-center">
                   <div className="text-center space-y-2">
                     <MapPin className="h-12 w-12 mx-auto text-muted-foreground opacity-50" />
