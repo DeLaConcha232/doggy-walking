@@ -23,6 +23,7 @@ const Dashboard = () => {
   const [walks, setWalks] = useState<WalkData[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAffiliated, setIsAffiliated] = useState(false);
+  const [affiliatedAdminId, setAffiliatedAdminId] = useState<string | null>(null);
   const [hasActiveWalk, setHasActiveWalk] = useState(false);
   const navigate = useNavigate();
 
@@ -49,20 +50,68 @@ const Dashboard = () => {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
+  // Subscribe to walks changes to detect active walks in real-time
+  useEffect(() => {
+    if (!affiliatedAdminId) return;
+
+    const channel = supabase
+      .channel('walks-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'walks',
+          filter: `walker_id=eq.${affiliatedAdminId}`
+        },
+        (payload) => {
+          // Check if there's an active walk
+          if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
+            const walk = payload.new as WalkData;
+            setHasActiveWalk(walk.status === 'active');
+          } else if (payload.eventType === 'DELETE') {
+            checkAdminActiveWalk(affiliatedAdminId);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [affiliatedAdminId]);
+
   const checkAffiliation = async (userId: string) => {
     try {
       const { data, error } = await supabase
         .from('affiliations')
-        .select('*')
+        .select('admin_id')
         .eq('user_id', userId)
         .eq('is_active', true)
-        .single();
+        .maybeSingle();
 
       if (!error && data) {
         setIsAffiliated(true);
+        setAffiliatedAdminId(data.admin_id);
+        checkAdminActiveWalk(data.admin_id);
       }
     } catch (error) {
       console.error('Error checking affiliation:', error);
+    }
+  };
+
+  const checkAdminActiveWalk = async (adminId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('walks')
+        .select('id, status')
+        .eq('walker_id', adminId)
+        .eq('status', 'active')
+        .maybeSingle();
+
+      setHasActiveWalk(!!data && !error);
+    } catch (error) {
+      console.error('Error checking active walk:', error);
     }
   };
 
@@ -234,7 +283,7 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent className="relative">
               <Suspense fallback={<div className="h-[400px] w-full rounded-lg bg-muted animate-pulse" /> }>
-                <AdminTrackingMap />
+                <AdminTrackingMap adminId={affiliatedAdminId} />
               </Suspense>
               {!hasActiveWalk && (
                 <div className="absolute inset-0 backdrop-blur-sm bg-background/60 rounded-lg flex items-center justify-center">

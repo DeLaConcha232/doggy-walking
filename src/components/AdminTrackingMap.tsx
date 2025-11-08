@@ -18,9 +18,14 @@ interface AdminLocation {
   latitude: number;
   longitude: number;
   timestamp: string;
+  is_active: boolean;
 }
 
-const AdminTrackingMap = memo(() => {
+interface AdminTrackingMapProps {
+  adminId: string | null;
+}
+
+const AdminTrackingMap = memo(({ adminId }: AdminTrackingMapProps) => {
   const mapRef = useRef<L.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const markerRef = useRef<L.Marker | null>(null);
@@ -44,13 +49,17 @@ const AdminTrackingMap = memo(() => {
   }, []);
 
   const loadLatestLocation = useCallback(async () => {
+    if (!adminId) return;
+    
     try {
       const { data, error } = await supabase
         .from('admin_locations')
         .select('*')
+        .eq('admin_id', adminId)
+        .eq('is_active', true)
         .order('timestamp', { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       if (data) {
@@ -60,10 +69,10 @@ const AdminTrackingMap = memo(() => {
     } catch (error) {
       // Silently fail if no locations yet
     }
-  }, [updateMarker]);
+  }, [adminId, updateMarker]);
 
   useEffect(() => {
-    if (!mapContainerRef.current) return;
+    if (!mapContainerRef.current || !adminId) return;
 
     // Initialize map
     const defaultCenter: [number, number] = [40.4168, -3.7038]; // Madrid default
@@ -84,12 +93,15 @@ const AdminTrackingMap = memo(() => {
         {
           event: 'INSERT',
           schema: 'public',
-          table: 'admin_locations'
+          table: 'admin_locations',
+          filter: `admin_id=eq.${adminId}`
         },
         (payload) => {
           const newLocation = payload.new as AdminLocation;
-          setLastLocation(newLocation);
-          updateMarker(newLocation);
+          if (newLocation.is_active) {
+            setLastLocation(newLocation);
+            updateMarker(newLocation);
+          }
         }
       )
       .subscribe();
@@ -101,7 +113,7 @@ const AdminTrackingMap = memo(() => {
       }
       supabase.removeChannel(channel);
     };
-  }, [loadLatestLocation, updateMarker]);
+  }, [adminId, loadLatestLocation, updateMarker]);
 
   return (
     <div className="space-y-2">
