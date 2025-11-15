@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { MapPin, LogOut, QrCode, Clock, Loader2, UserIcon, Heart } from "lucide-react";
+import { MapPin, LogOut, QrCode, Clock, Loader2, UserIcon, Heart, Info, Scan, Navigation } from "lucide-react";
 import { toast } from "sonner";
 import type { User } from "@supabase/supabase-js";
 import { Suspense, lazy } from "react";
@@ -269,6 +269,68 @@ const Dashboard = () => {
             </CardHeader>
           </Card>
         </div>
+
+        {/* How It Works Card */}
+        <Card className="mb-8 animate-fade-in border-border/50 bg-gradient-to-br from-primary/5 to-primary-glow/5">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Info className="h-5 w-5 text-primary" />
+              ¿Cómo funciona BarkPath?
+            </CardTitle>
+            <CardDescription>
+              Todo lo que necesitas saber para usar el sistema
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="space-y-3">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                    <Scan className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-1">1. Afíliate con tu paseador</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Tu paseador te proporcionará un código QR único. Escanéalo desde "Escanear QR" para conectarte con él y comenzar a recibir actualizaciones de los paseos.
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                    <Navigation className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-1">2. Seguimiento en tiempo real</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Cuando tu paseador inicie un nuevo paseo, podrás ver su ubicación en tiempo real en el mapa de arriba. Las coordenadas se actualizan automáticamente cada 10 minutos para que siempre sepas dónde está tu mascota.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                    <MapPin className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-1">3. Ubicación precisa</h4>
+                    <p className="text-sm text-muted-foreground">
+                      El sistema utiliza GPS de alta precisión para mostrarte la ubicación exacta del paseo. El marcador en el mapa indica la posición más reciente de tu paseador.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="bg-primary/5 border border-primary/10 rounded-lg p-4">
+                  <p className="text-sm text-foreground">
+                    <strong className="text-primary">Nota:</strong> El mapa se mantiene borroso hasta que tu paseador inicie un paseo activo. Una vez iniciado, verás toda la información en tiempo real.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Real-time Tracking Map - Always show if affiliated */}
         {isAffiliated && (
