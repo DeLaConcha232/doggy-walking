@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { MapPin, LogOut, QrCode, Clock, Loader2, UserIcon, Heart, Info, Scan, Navigation } from "lucide-react";
 import { toast } from "sonner";
 import type { User } from "@supabase/supabase-js";
@@ -271,19 +272,32 @@ const Dashboard = () => {
         </div>
 
         {/* How It Works Card */}
-        <Card className="mb-8 animate-fade-in border-border/50 bg-gradient-to-br from-primary/5 to-primary-glow/5">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Info className="h-5 w-5 text-primary" />
-              ¿Cómo funciona BarkPath?
-            </CardTitle>
-            <CardDescription>
-              Todo lo que necesitas saber para usar el sistema
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="space-y-3">
+        <Dialog>
+          <DialogTrigger asChild>
+            <Card className="mb-8 animate-fade-in border-border/50 bg-gradient-to-br from-primary/5 to-primary-glow/5 cursor-pointer hover:shadow-lg transition-all">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Info className="h-5 w-5 text-primary" />
+                  ¿Cómo funciona Doggy-walking?
+                </CardTitle>
+                <CardDescription>
+                  Toca aquí para conocer cómo usar el sistema
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          </DialogTrigger>
+          <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-2xl">
+                <Info className="h-6 w-6 text-primary" />
+                ¿Cómo funciona Doggy-walking?
+              </DialogTitle>
+              <DialogDescription>
+                Todo lo que necesitas saber para usar el sistema
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid md:grid-cols-2 gap-6 mt-4">
+              <div className="space-y-4">
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
                     <Scan className="h-5 w-5 text-primary" />
@@ -309,7 +323,7 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
                     <MapPin className="h-5 w-5 text-primary" />
@@ -329,8 +343,8 @@ const Dashboard = () => {
                 </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </DialogContent>
+        </Dialog>
 
         {/* Real-time Tracking Map - Always show if affiliated */}
         {isAffiliated && (

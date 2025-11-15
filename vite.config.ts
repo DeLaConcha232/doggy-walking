@@ -17,9 +17,9 @@ export default defineConfig(({ mode }) => ({
       registerType: "autoUpdate",
       includeAssets: ["icon-192.png", "icon-512.png", "apple-touch-icon.png"],
       manifest: {
-        name: "BarkPath - Seguimiento GPS para Paseos de Perros",
-        short_name: "BarkPath",
-        description: "Monitorea el paseo de tu perro en tiempo real con BarkPath. Recibe actualizaciones cada 10 minutos con ubicación GPS precisa.",
+        name: "Doggy-walking - Seguimiento GPS para Paseos de Perros",
+        short_name: "Doggy-walking",
+        description: "Monitorea el paseo de tu perro en tiempo real con Doggy-walking. Recibe actualizaciones cada 10 minutos con ubicación GPS precisa.",
         theme_color: "#3b82f6",
         background_color: "#ffffff",
         display: "standalone",

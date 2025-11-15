@@ -13,7 +13,7 @@ const Index = () => {
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <MapPin className="h-6 w-6 text-primary" />
-            <span className="text-xl font-bold">BarkPath</span>
+            <span className="text-xl font-bold">Doggy-walking</span>
           </div>
           <div className="flex items-center gap-4">
             <Link to="/auth">
@@ -66,7 +66,7 @@ const Index = () => {
       <section className="py-16 md:py-24 bg-muted/30 px-4">
         <div className="container mx-auto">
           <div className="text-center mb-16 animate-slide-up">
-            <h2 className="mb-4">¿Por qué BarkPath?</h2>
+            <h2 className="mb-4">¿Por qué Doggy-walking?</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Tecnología premium para el cuidado de tu mejor amigo
             </p>
@@ -210,7 +210,7 @@ const Index = () => {
         <div className="container mx-auto text-center">
           <h2 className="mb-4 text-white">Comienza hoy mismo</h2>
           <p className="text-lg text-white/90 mb-8 max-w-2xl mx-auto">
-            Únete a cientos de dueños que confían en BarkPath para el cuidado de sus mascotas
+            Únete a cientos de dueños que confían en Doggy-walking para el cuidado de sus mascotas
           </p>
           <Link to="/auth">
             <Button size="lg" variant="secondary" className="shadow-xl hover:shadow-2xl">
@@ -223,7 +223,7 @@ const Index = () => {
       {/* Footer */}
       <footer className="py-12 px-4 border-t">
         <div className="container mx-auto text-center text-muted-foreground">
-          <p>© 2025 BarkPath. Todos los derechos reservados.</p>
+          <p>© 2025 Doggy-walking. Todos los derechos reservados.</p>
         </div>
       </footer>
     </div>
