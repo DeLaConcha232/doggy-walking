@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { MapPin, Shield, Clock, Smartphone, QrCode, Play, CheckCircle } from "lucide-react";
+import { MapPin, Shield, Clock, Smartphone, QrCode, Play } from "lucide-react";
 import heroImage from "@/assets/hero-dogs.jpg";
 import appPreview from "@/assets/app-preview.jpg";
 
@@ -121,31 +121,25 @@ const Index = () => {
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
             {[
               {
                 icon: QrCode,
                 step: "1",
-                title: "Escanea el QR",
-                description: "Tu paseador te proporcionará un código QR único. Escanéalo para afiliarte instantáneamente."
+                title: "Escanea el QR de tu paseador",
+                description: "Tu paseador te proporcionará un código QR único. Escanéalo para afiliarte instantáneamente y estar conectados."
               },
               {
                 icon: Play,
                 step: "2",
-                title: "Inicia el paseo",
-                description: "El paseador inicia el paseo desde su dispositivo cuando recoge a tu perro."
+                title: "Tu paseador inicia el paseo",
+                description: "Cuando tu paseador inicie un nuevo paseo con tu mascota, recibirás una notificación en tu dispositivo."
               },
               {
                 icon: MapPin,
                 step: "3",
-                title: "Seguimiento en vivo",
-                description: "Observa en tiempo real la ubicación exacta de tu perro actualizada cada 10 minutos."
-              },
-              {
-                icon: CheckCircle,
-                step: "4",
-                title: "Historial guardado",
-                description: "Al finalizar, revisa la ruta completa del paseo en tu historial cuando quieras."
+                title: "Seguimiento en tiempo real",
+                description: "Podrás ver la ubicación exacta de tu paseador en tiempo real en el mapa. Las coordenadas se actualizan automáticamente cada 10 minutos para tu tranquilidad."
               }
             ].map((item, index) => (
               <Card 
