@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { MapPin, Shield, Clock, Smartphone } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { MapPin, Shield, Clock, Smartphone, QrCode, Play, CheckCircle } from "lucide-react";
 import heroImage from "@/assets/hero-dogs.jpg";
 import appPreview from "@/assets/app-preview.jpg";
 
@@ -110,8 +111,70 @@ const Index = () => {
         </div>
       </section>
 
-      {/* App Preview Section */}
+      {/* How It Works Section */}
       <section className="py-16 md:py-24 px-4">
+        <div className="container mx-auto">
+          <div className="text-center mb-16 animate-slide-up">
+            <h2 className="mb-4">¿Cómo funciona?</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Comenzar es fácil y rápido. Sigue estos simples pasos
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+            {[
+              {
+                icon: QrCode,
+                step: "1",
+                title: "Escanea el QR",
+                description: "Tu paseador te proporcionará un código QR único. Escanéalo para afiliarte instantáneamente."
+              },
+              {
+                icon: Play,
+                step: "2",
+                title: "Inicia el paseo",
+                description: "El paseador inicia el paseo desde su dispositivo cuando recoge a tu perro."
+              },
+              {
+                icon: MapPin,
+                step: "3",
+                title: "Seguimiento en vivo",
+                description: "Observa en tiempo real la ubicación exacta de tu perro actualizada cada 10 minutos."
+              },
+              {
+                icon: CheckCircle,
+                step: "4",
+                title: "Historial guardado",
+                description: "Al finalizar, revisa la ruta completa del paseo en tu historial cuando quieras."
+              }
+            ].map((item, index) => (
+              <Card 
+                key={index} 
+                className="relative overflow-hidden hover:shadow-lg transition-shadow animate-slide-up border-border/50"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <div className="absolute top-0 right-0 text-8xl font-bold text-primary/5 -mr-4 -mt-4">
+                  {item.step}
+                </div>
+                <CardHeader>
+                  <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-4 relative z-10">
+                    <item.icon className="h-6 w-6 text-primary" />
+                  </div>
+                  <CardTitle className="text-xl relative z-10">{item.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription className="text-base">
+                    {item.description}
+                  </CardDescription>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* App Preview Section */}
+      <section className="py-16 md:py-24 px-4 bg-muted/30">
         <div className="container mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="relative animate-fade-in order-2 lg:order-1">
