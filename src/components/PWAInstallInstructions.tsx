@@ -28,7 +28,7 @@ const PWAInstallInstructions = () => {
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Instalar BarkPath</DialogTitle>
+          <DialogTitle>Instalar Doggy-walking</DialogTitle>
           <DialogDescription>
             {!selectedPlatform 
               ? "Selecciona tu dispositivo para ver las instrucciones"
