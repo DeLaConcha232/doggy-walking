@@ -54,7 +54,10 @@ const Index = () => {
               <div className="absolute -inset-4 bg-gradient-to-r from-primary/20 to-primary-glow/20 rounded-3xl blur-2xl" />
               <img
                 src={heroImage}
-                alt="Perros felices en el parque"
+                alt="Perros felices paseando con su cuidador profesional en un parque verde"
+                loading="eager"
+                width="800"
+                height="600"
                 className="relative rounded-2xl shadow-2xl w-full h-auto object-cover"
               />
             </div>
@@ -175,7 +178,10 @@ const Index = () => {
               <div className="absolute -inset-4 bg-gradient-to-l from-primary/20 to-primary-glow/20 rounded-3xl blur-2xl" />
               <img
                 src={appPreview}
-                alt="Vista de la aplicación"
+                alt="Vista previa de la interfaz de la aplicación Doggy-walking mostrando el mapa de seguimiento GPS en tiempo real del paseo de perros"
+                loading="lazy"
+                width="800"
+                height="600"
                 className="relative rounded-2xl shadow-2xl w-full h-auto object-cover"
               />
             </div>
