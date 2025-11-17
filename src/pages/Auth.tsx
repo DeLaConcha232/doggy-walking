@@ -19,6 +19,7 @@ const authSchema = z.object({
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -51,7 +52,23 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      if (isLogin) {
+      if (isForgotPassword) {
+        // Password reset
+        const resetData = authSchema.pick({ email: true }).parse({
+          email: formData.email,
+        });
+
+        const { error } = await supabase.auth.resetPasswordForEmail(
+          resetData.email,
+          {
+            redirectTo: `${window.location.origin}/auth`,
+          }
+        );
+
+        if (error) throw error;
+        toast.success("¡Revisa tu email para restablecer tu contraseña!");
+        setIsForgotPassword(false);
+      } else if (isLogin) {
         // Login validation
         const loginData = authSchema.pick({ email: true, password: true }).parse({
           email: formData.email,
@@ -107,17 +124,23 @@ const Auth = () => {
             </div>
           </div>
           <CardTitle className="text-2xl">
-            {isLogin ? "Bienvenido de vuelta" : "Crear cuenta"}
+            {isForgotPassword 
+              ? "Recuperar contraseña" 
+              : isLogin 
+              ? "Bienvenido de vuelta" 
+              : "Crear cuenta"}
           </CardTitle>
           <CardDescription>
-            {isLogin
+            {isForgotPassword
+              ? "Ingresa tu email para recibir instrucciones"
+              : isLogin
               ? "Ingresa tus credenciales para continuar"
               : "Comienza a monitorear los paseos de tu mascota"}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            {!isLogin && (
+            {!isLogin && !isForgotPassword && (
               <>
                 <div className="space-y-2">
                   <Label htmlFor="name">Nombre completo</Label>
@@ -158,8 +181,9 @@ const Auth = () => {
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="password">Contraseña</Label>
+            {!isForgotPassword && (
+              <div className="space-y-2">
+                <Label htmlFor="password">Contraseña</Label>
               <Input
                 id="password"
                 type="password"
@@ -173,21 +197,41 @@ const Auth = () => {
               {!isLogin && (
                 <p className="text-xs text-muted-foreground">Mínimo 6 caracteres</p>
               )}
-            </div>
+              </div>
+            )}
 
             <Button type="submit" className="w-full" disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isLogin ? "Iniciar Sesión" : "Crear Cuenta"}
+              {isForgotPassword 
+                ? "Enviar instrucciones" 
+                : isLogin 
+                ? "Iniciar Sesión" 
+                : "Crear Cuenta"}
             </Button>
           </form>
 
           <div className="mt-6 text-center space-y-3">
+            {!isForgotPassword && isLogin && (
+              <button
+                type="button"
+                onClick={() => setIsForgotPassword(true)}
+                className="text-sm text-muted-foreground hover:text-primary transition-colors block w-full"
+              >
+                ¿Olvidaste tu contraseña?
+              </button>
+            )}
+            
             <button
               type="button"
-              onClick={() => setIsLogin(!isLogin)}
-              className="text-sm text-muted-foreground hover:text-primary transition-colors"
+              onClick={() => {
+                setIsForgotPassword(false);
+                setIsLogin(!isLogin);
+              }}
+              className="text-sm text-muted-foreground hover:text-primary transition-colors block w-full"
             >
-              {isLogin
+              {isForgotPassword
+                ? "Volver al inicio de sesión"
+                : isLogin
                 ? "¿No tienes cuenta? Regístrate"
                 : "¿Ya tienes cuenta? Inicia sesión"}
             </button>
