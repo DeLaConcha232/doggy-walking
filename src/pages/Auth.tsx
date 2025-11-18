@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { MapPin, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { z } from "zod";
 import PWAInstallInstructions from "@/components/PWAInstallInstructions";
 
@@ -61,7 +61,7 @@ const Auth = () => {
         const { error } = await supabase.auth.resetPasswordForEmail(
           resetData.email,
           {
-            redirectTo: `${window.location.origin}/auth`,
+            redirectTo: `${window.location.origin}/reset-password`,
           }
         );
 
@@ -119,15 +119,17 @@ const Auth = () => {
       <Card className="w-full max-w-md shadow-2xl border-border/50 animate-scale-in">
         <CardHeader className="space-y-2 text-center pb-6">
           <div className="flex justify-center mb-2">
-            <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center">
-              <MapPin className="h-6 w-6 text-white" />
-            </div>
+            <img 
+              src="/icon-192.png" 
+              alt="Doggy-walking" 
+              className="w-12 h-12 rounded-2xl"
+            />
           </div>
           <CardTitle className="text-2xl">
             {isForgotPassword 
               ? "Recuperar contraseña" 
               : isLogin 
-              ? "Bienvenido de vuelta" 
+              ? "Bienvenido a Doggy-walking" 
               : "Crear cuenta"}
           </CardTitle>
           <CardDescription>
