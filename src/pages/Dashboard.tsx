@@ -207,7 +207,7 @@ const Dashboard = () => {
         {/* Welcome Section */}
         <div className="mb-8 animate-slide-up">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">
-            ¡Hola! 👋
+            ¡Hola buen día!
           </h1>
           <p className="text-muted-foreground">
             Bienvenido a tu panel de control
@@ -215,7 +215,7 @@ const Dashboard = () => {
         </div>
 
         {/* Quick Actions */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
           <Card
             className="cursor-pointer hover:shadow-lg transition-all animate-scale-in border-border/50"
             onClick={() => navigate("/scan-qr")}
@@ -237,7 +237,6 @@ const Dashboard = () => {
             </CardHeader>
           </Card>
 
-
           {/* <Card
             className="cursor-pointer hover:shadow-lg transition-all animate-scale-in border-border/50"
             style={{ animationDelay: "0.1s" }}
@@ -253,30 +252,51 @@ const Dashboard = () => {
               </CardDescription>
             </CardHeader>
           </Card> */}
-
-          <Card
-            className="cursor-pointer hover:shadow-lg transition-all animate-scale-in border-border/50"
-            style={{ animationDelay: "0.15s" }}
-            onClick={() => navigate("/profile")}
-          >
-            <CardHeader>
-              <div className="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center mb-2">
-                <UserIcon className="h-6 w-6 text-accent" />
-              </div>
-              <CardTitle>Mi Perfil</CardTitle>
-              <CardDescription>
-                Configuración
-              </CardDescription>
-            </CardHeader>
-          </Card>
+          
         </div>
+
+        {/* Real-time Tracking Map - Always show if affiliated */}
+          {isAffiliated && (
+            <Card className="animate-fade-in border-border/50 mb-6">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MapPin className="h-5 w-5 text-primary" />
+                  Ubicación en Tiempo Real
+                </CardTitle>
+                <CardDescription>
+                  Seguimiento de la ubicación del administrador
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="relative">
+                <Suspense fallback={<div className="h-[400px] w-full rounded-lg bg-muted animate-pulse" />}>
+                  <AdminTrackingMap
+                    adminId={affiliatedAdminId}
+                    onLocationUpdate={setHasAdminLocation}
+                  />
+                </Suspense>
+                {!hasActiveWalk && !hasAdminLocation && (
+                  <div className="absolute inset-0 backdrop-blur-sm bg-background/60 rounded-lg flex items-center justify-center">
+                    <div className="text-center space-y-2">
+                      <MapPin className="h-12 w-12 mx-auto text-muted-foreground opacity-50" />
+                      <p className="text-lg font-medium text-foreground">
+                        No hay paseo activo
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        El mapa se activará cuando comience un paseo
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
 
         {/* How It Works Card */}
         <Dialog>
           <DialogTrigger asChild>
-            <Card className="mb-8 animate-fade-in border-border/50 bg-gradient-to-br from-primary/5 to-primary-glow/5 cursor-pointer hover:shadow-lg transition-all">
+            <Card className="mb-6 animate-fade-in border-border/50 bg-gradient-to-br from-primary/5 to-primary-glow/5 cursor-pointer hover:shadow-lg transition-all">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-3">
                   <Info className="h-5 w-5 text-primary" />
                   ¿Cómo funciona Doggy-walking?
                 </CardTitle>
@@ -309,7 +329,7 @@ const Dashboard = () => {
                     </p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
                     <Navigation className="h-5 w-5 text-primary" />
@@ -346,41 +366,23 @@ const Dashboard = () => {
           </DialogContent>
         </Dialog>
 
-        {/* Real-time Tracking Map - Always show if affiliated */}
-        {isAffiliated && (
-          <Card className="animate-fade-in border-border/50 mb-8">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <MapPin className="h-5 w-5" />
-                Ubicación en Tiempo Real
-              </CardTitle>
-              <CardDescription>
-                Seguimiento de la ubicación del administrador
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="relative">
-              <Suspense fallback={<div className="h-[400px] w-full rounded-lg bg-muted animate-pulse" /> }>
-                <AdminTrackingMap 
-                  adminId={affiliatedAdminId} 
-                  onLocationUpdate={setHasAdminLocation}
-                />
-              </Suspense>
-              {!hasActiveWalk && !hasAdminLocation && (
-                <div className="absolute inset-0 backdrop-blur-sm bg-background/60 rounded-lg flex items-center justify-center">
-                  <div className="text-center space-y-2">
-                    <MapPin className="h-12 w-12 mx-auto text-muted-foreground opacity-50" />
-                    <p className="text-lg font-medium text-foreground">
-                      No hay paseo activo
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      El mapa se activará cuando comience un paseo
-                    </p>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        )}
+        <Card
+          className="cursor-pointer hover:shadow-lg transition-all animate-scale-in border-border/50 mb-8"
+          style={{ animationDelay: "0.15s" }}
+          onClick={() => navigate("/profile")}
+        >
+          <CardHeader>
+            <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-2">
+              <UserIcon className="h-6 w-6 text-primary" />
+            </div>
+            <CardTitle>Mi Perfil</CardTitle>
+            <CardDescription>
+              Configuración
+            </CardDescription>
+          </CardHeader>
+        </Card>
+
+
 
         {/* Recent Walks */}
         {/* <Card className="animate-fade-in border-border/50">
