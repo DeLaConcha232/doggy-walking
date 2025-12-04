@@ -30,20 +30,38 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check authentication
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    // Check authentication and role
+    const checkAuthAndRole = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      
       if (!session) {
-        navigate("/auth");
-      } else {
-        setUser(session.user);
-        loadWalks(session.user.id);
-        checkAffiliation(session.user.id);
+        navigate("/");
+        return;
       }
-    });
+      
+      setUser(session.user);
+      
+      // Check if user is admin (walker) - redirect to walker dashboard
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', session.user.id)
+        .maybeSingle();
+        
+      if (roleData?.role === 'admin') {
+        navigate("/walker-dashboard");
+        return;
+      }
+      
+      loadWalks(session.user.id);
+      checkAffiliation(session.user.id);
+    };
+
+    checkAuthAndRole();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_OUT" || !session) {
-        navigate("/auth");
+        navigate("/");
       } else {
         setUser(session.user);
       }

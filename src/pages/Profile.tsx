@@ -10,11 +10,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ArrowLeft, User as UserIcon, Mail, Phone, Save, Moon, Sun, Monitor } from 'lucide-react';
 import { toast } from 'sonner';
 
+type UserRole = 'admin' | 'user' | 'moderator' | null;
+
 const Profile = () => {
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [userRole, setUserRole] = useState<UserRole>(null);
   const [profile, setProfile] = useState({
     name: '',
     email: '',
@@ -28,6 +31,15 @@ const Profile = () => {
         navigate('/');
         return;
       }
+
+      // Check user role
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      setUserRole(roleData?.role as UserRole || 'user');
 
       const { data, error } = await supabase
         .from('profiles')
@@ -90,13 +102,21 @@ const Profile = () => {
     );
   }
 
+  const handleBack = () => {
+    if (userRole === 'admin') {
+      navigate('/walker-dashboard');
+    } else {
+      navigate('/dashboard');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
       <nav className="bg-card border-b border-border/40 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Button
             variant="ghost"
-            onClick={() => navigate('/dashboard')}
+            onClick={handleBack}
             className="gap-2"
           >
             <ArrowLeft className="h-4 w-4" />
