@@ -9,6 +9,7 @@ import WhatsAppButton from "@/components/WhatsAppButton";
 const Auth = lazy(() => import("./pages/Auth"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
+const WalkerDashboard = lazy(() => import("./pages/WalkerDashboard"));
 const WalkTracking = lazy(() => import("./pages/WalkTracking"));
 const Profile = lazy(() => import("./pages/Profile"));
 const MyWalks = lazy(() => import("./pages/MyWalks"));
@@ -43,8 +44,10 @@ const App = () => (
         }>
           <Routes>
             <Route path="/" element={<Auth />} />
+            <Route path="/auth" element={<Auth />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/walker-dashboard" element={<WalkerDashboard />} />
             <Route path="/walk/:walkId" element={<WalkTracking />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/my-walks" element={<MyWalks />} />

@@ -21,6 +21,7 @@ const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [checkingRole, setCheckingRole] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -29,18 +30,47 @@ const Auth = () => {
   });
   const navigate = useNavigate();
 
+  const checkUserRoleAndRedirect = async (userId: string) => {
+    setCheckingRole(true);
+    try {
+      // Check user role from user_roles table
+      const { data: roleData, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Error checking role:', error);
+        navigate("/dashboard"); // Default to user dashboard
+        return;
+      }
+
+      if (roleData?.role === 'admin') {
+        navigate("/walker-dashboard");
+      } else {
+        navigate("/dashboard");
+      }
+    } catch (err) {
+      console.error('Error in role check:', err);
+      navigate("/dashboard");
+    } finally {
+      setCheckingRole(false);
+    }
+  };
+
   useEffect(() => {
     // Check if user is already logged in
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        navigate("/dashboard");
+        checkUserRoleAndRedirect(session.user.id);
       }
     });
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_IN" && session) {
-        navigate("/dashboard");
+        checkUserRoleAndRedirect(session.user.id);
       }
     });
 
