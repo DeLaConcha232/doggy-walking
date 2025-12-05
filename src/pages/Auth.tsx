@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, User, Dog } from "lucide-react";
 import { z } from "zod";
 import PWAInstallInstructions from "@/components/PWAInstallInstructions";
 
@@ -15,6 +16,7 @@ const authSchema = z.object({
   password: z.string().min(6, "Mínimo 6 caracteres").max(100),
   name: z.string().min(2, "Mínimo 2 caracteres").max(100).optional(),
   phone: z.string().max(20).optional(),
+  role: z.enum(["user", "admin"]).optional(),
 });
 
 const Auth = () => {
@@ -27,13 +29,13 @@ const Auth = () => {
     password: "",
     name: "",
     phone: "",
+    role: "user" as "user" | "admin",
   });
   const navigate = useNavigate();
 
   const checkUserRoleAndRedirect = async (userId: string) => {
     setCheckingRole(true);
     try {
-      // Check user role from user_roles table
       const { data: roleData, error } = await supabase
         .from('user_roles')
         .select('role')
@@ -42,7 +44,7 @@ const Auth = () => {
 
       if (error) {
         console.error('Error checking role:', error);
-        navigate("/dashboard"); // Default to user dashboard
+        navigate("/dashboard");
         return;
       }
 
@@ -60,14 +62,12 @@ const Auth = () => {
   };
 
   useEffect(() => {
-    // Check if user is already logged in
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         checkUserRoleAndRedirect(session.user.id);
       }
     });
 
-    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_IN" && session) {
         checkUserRoleAndRedirect(session.user.id);
@@ -83,7 +83,6 @@ const Auth = () => {
 
     try {
       if (isForgotPassword) {
-        // Password reset
         const resetData = authSchema.pick({ email: true }).parse({
           email: formData.email,
         });
@@ -99,7 +98,6 @@ const Auth = () => {
         toast.success("¡Revisa tu email para restablecer tu contraseña!");
         setIsForgotPassword(false);
       } else if (isLogin) {
-        // Login validation
         const loginData = authSchema.pick({ email: true, password: true }).parse({
           email: formData.email,
           password: formData.password,
@@ -113,14 +111,13 @@ const Auth = () => {
         if (error) throw error;
         toast.success("¡Bienvenido de vuelta!");
       } else {
-        // Signup validation
         const signupData = authSchema.parse(formData);
 
-        const { error } = await supabase.auth.signUp({
+        const { data: authData, error: signUpError } = await supabase.auth.signUp({
           email: signupData.email,
           password: signupData.password,
           options: {
-            emailRedirectTo: `${window.location.origin}/dashboard`,
+            emailRedirectTo: `${window.location.origin}/`,
             data: {
               name: signupData.name,
               phone: signupData.phone,
@@ -128,7 +125,30 @@ const Auth = () => {
           },
         });
 
-        if (error) throw error;
+        if (signUpError) throw signUpError;
+
+        // Assign role if user was created
+        if (authData.user) {
+          const { error: roleError } = await supabase
+            .from('user_roles')
+            .insert({
+              user_id: authData.user.id,
+              role: formData.role,
+            });
+
+          if (roleError) {
+            console.error('Error assigning role:', roleError);
+          }
+
+          // If walker, create walker_profile placeholder
+          if (formData.role === 'admin') {
+            await supabase.from('walker_profiles').insert({
+              user_id: authData.user.id,
+              is_available: false,
+            });
+          }
+        }
+
         toast.success("¡Cuenta creada! Revisa tu email para confirmar.");
       }
     } catch (err: unknown) {
@@ -167,13 +187,58 @@ const Auth = () => {
               ? "Ingresa tu email para recibir instrucciones"
               : isLogin
               ? "Ingresa tus credenciales para continuar"
-              : "Comienza a monitorear los paseos de tu mascota"}
+              : "Selecciona tu tipo de cuenta para comenzar"}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             {!isLogin && !isForgotPassword && (
               <>
+                {/* Role Selection */}
+                <div className="space-y-3">
+                  <Label>Tipo de cuenta</Label>
+                  <RadioGroup
+                    value={formData.role}
+                    onValueChange={(value) => setFormData({ ...formData, role: value as "user" | "admin" })}
+                    className="grid grid-cols-2 gap-4"
+                  >
+                    <div>
+                      <RadioGroupItem
+                        value="user"
+                        id="user"
+                        className="peer sr-only"
+                      />
+                      <Label
+                        htmlFor="user"
+                        className="flex flex-col items-center justify-between rounded-lg border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
+                      >
+                        <User className="h-6 w-6 mb-2" />
+                        <span className="font-medium">Cliente</span>
+                        <span className="text-xs text-muted-foreground text-center mt-1">
+                          Busco paseadores
+                        </span>
+                      </Label>
+                    </div>
+                    <div>
+                      <RadioGroupItem
+                        value="admin"
+                        id="admin"
+                        className="peer sr-only"
+                      />
+                      <Label
+                        htmlFor="admin"
+                        className="flex flex-col items-center justify-between rounded-lg border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
+                      >
+                        <Dog className="h-6 w-6 mb-2" />
+                        <span className="font-medium">Paseador</span>
+                        <span className="text-xs text-muted-foreground text-center mt-1">
+                          Ofrezco servicios
+                        </span>
+                      </Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+
                 <div className="space-y-2">
                   <Label htmlFor="name">Nombre completo</Label>
                   <Input

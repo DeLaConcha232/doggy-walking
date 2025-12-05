@@ -3,13 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { LogOut, MapPin, Users, Activity, Calendar, Loader2, Play, Square, Heart } from "lucide-react";
+import { LogOut, Users, Loader2, Heart, Inbox, Settings2 } from "lucide-react";
 import { toast } from "sonner";
 import { useUserRole } from "@/hooks/useUserRole";
 import WalkerQRDisplay from "@/components/walker/WalkerQRDisplay";
 import WalkerMetrics from "@/components/walker/WalkerMetrics";
 import WalkerClients from "@/components/walker/WalkerClients";
 import WalkerLocationTracker from "@/components/walker/WalkerLocationTracker";
+import WalkerProfileSetup from "@/components/walker/WalkerProfileSetup";
 import iconLogo from '/icon-192.png';
 
 interface WalkMetrics {
@@ -17,6 +18,7 @@ interface WalkMetrics {
   activeWalks: number;
   walksToday: number;
   totalWalks: number;
+  pendingRequests: number;
 }
 
 const WalkerDashboard = () => {
@@ -26,7 +28,8 @@ const WalkerDashboard = () => {
     activeClients: 0,
     activeWalks: 0,
     walksToday: 0,
-    totalWalks: 0
+    totalWalks: 0,
+    pendingRequests: 0
   });
   const [isWalkActive, setIsWalkActive] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -35,7 +38,6 @@ const WalkerDashboard = () => {
     if (!user) return;
 
     try {
-      // Get active clients (affiliations)
       const { data: affiliations, error: affError } = await supabase
         .from('affiliations')
         .select('id')
@@ -44,7 +46,6 @@ const WalkerDashboard = () => {
 
       if (affError) throw affError;
 
-      // Get walks statistics
       const { data: allWalks, error: walksError } = await supabase
         .from('walks')
         .select('id, status, created_at')
@@ -52,12 +53,18 @@ const WalkerDashboard = () => {
 
       if (walksError) throw walksError;
 
-      // Get profile for completed walks count
       const { data: profile } = await supabase
         .from('profiles')
         .select('completed_walks_count')
         .eq('id', user.id)
         .single();
+
+      // Get pending requests count
+      const { data: requests } = await supabase
+        .from('walk_requests')
+        .select('id')
+        .eq('walker_id', user.id)
+        .eq('status', 'pending');
 
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -73,12 +80,12 @@ const WalkerDashboard = () => {
         activeClients: affiliations?.length || 0,
         activeWalks: activeWalks.length,
         walksToday: walksToday.length,
-        totalWalks: profile?.completed_walks_count || 0
+        totalWalks: profile?.completed_walks_count || 0,
+        pendingRequests: requests?.length || 0
       });
 
       setIsWalkActive(activeWalks.length > 0);
 
-      // Check if there's active location tracking
       const { data: activeLocation } = await supabase
         .from('admin_locations')
         .select('is_active')
@@ -104,12 +111,33 @@ const WalkerDashboard = () => {
 
     if (user) {
       loadMetrics();
+
+      // Subscribe to new requests
+      const channel = supabase
+        .channel('walker-new-requests')
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'walk_requests',
+            filter: `walker_id=eq.${user.id}`
+          },
+          () => {
+            toast.info("¡Nueva solicitud de servicio!");
+            loadMetrics();
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
     }
   }, [user, isWalker, roleLoading, navigate, loadMetrics]);
 
   const handleLogout = async () => {
     try {
-      // Stop location tracking if active
       if (isWalkActive && user) {
         await supabase
           .from('admin_locations')
@@ -142,7 +170,7 @@ const WalkerDashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <nav className="border-b bg-card">
+      <nav className="border-b bg-card sticky top-0 z-40">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <img src={iconLogo} alt="Doggy-Walking" className="h-6 w-6 rounded-sm" />
@@ -156,16 +184,44 @@ const WalkerDashboard = () => {
         </div>
       </nav>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-6">
         {/* Welcome Section */}
-        <div className="mb-8 animate-slide-up">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">
+        <div className="mb-6 animate-slide-up">
+          <h1 className="text-2xl md:text-3xl font-bold mb-1">
             Panel de Paseador
           </h1>
           <p className="text-muted-foreground">
             Gestiona tus paseos y clientes
           </p>
         </div>
+
+        {/* Requests Card */}
+        <Card 
+          className="mb-6 cursor-pointer hover:shadow-lg transition-all animate-scale-in border-border/50"
+          onClick={() => navigate("/walker-requests")}
+        >
+          <CardContent className="flex items-center justify-between py-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center relative">
+                <Inbox className="h-6 w-6 text-primary" />
+                {metrics.pendingRequests > 0 && (
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-destructive text-destructive-foreground text-xs font-bold rounded-full flex items-center justify-center">
+                    {metrics.pendingRequests}
+                  </span>
+                )}
+              </div>
+              <div>
+                <p className="font-semibold">Solicitudes de Servicio</p>
+                <p className="text-sm text-muted-foreground">
+                  {metrics.pendingRequests > 0 
+                    ? `${metrics.pendingRequests} pendiente${metrics.pendingRequests > 1 ? 's' : ''}`
+                    : 'Sin solicitudes pendientes'
+                  }
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* QR Code and Start Walk Section */}
         <div className="grid md:grid-cols-2 gap-6 mb-6">
@@ -182,6 +238,11 @@ const WalkerDashboard = () => {
 
         {/* Clients */}
         <WalkerClients userId={user?.id || ''} />
+
+        {/* Walker Profile Setup */}
+        <div className="mt-6">
+          <WalkerProfileSetup userId={user?.id || ''} />
+        </div>
 
         {/* Profile Link */}
         <Card
