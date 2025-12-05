@@ -4,11 +4,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { MapPin, LogOut, QrCode, Clock, Loader2, UserIcon, Heart, Info, Scan, Navigation } from "lucide-react";
+import { MapPin, QrCode, Loader2, Info, Scan, Navigation, Search, Heart } from "lucide-react";
 import { toast } from "sonner";
 import type { User } from "@supabase/supabase-js";
 import { Suspense, lazy } from "react";
 const AdminTrackingMap = lazy(() => import("@/components/AdminTrackingMap"));
+import BottomNav from "@/components/ui/bottom-nav";
 import iconLogo from '/icon-192.png';
 
 interface WalkData {
@@ -30,7 +31,6 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check authentication and role
     const checkAuthAndRole = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       
@@ -41,7 +41,6 @@ const Dashboard = () => {
       
       setUser(session.user);
       
-      // Check if user is admin (walker) - redirect to walker dashboard
       const { data: roleData } = await supabase
         .from('user_roles')
         .select('role')
@@ -70,7 +69,6 @@ const Dashboard = () => {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
-  // Subscribe to walks changes to detect active walks in real-time
   useEffect(() => {
     if (!affiliatedAdminId) return;
 
@@ -85,7 +83,6 @@ const Dashboard = () => {
           filter: `walker_id=eq.${affiliatedAdminId}`
         },
         (payload) => {
-          // Check if there's an active walk
           if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
             const walk = payload.new as WalkData;
             setHasActiveWalk(walk.status === 'active');
@@ -147,7 +144,6 @@ const Dashboard = () => {
       if (error) throw error;
       setWalks(data || []);
 
-      // Check if there's an active walk
       const activeWalk = data?.find(walk => walk.status === 'active');
       setHasActiveWalk(!!activeWalk);
     } catch (err: unknown) {
@@ -155,45 +151,6 @@ const Dashboard = () => {
       toast.error("Error al cargar paseos");
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleLogout = async () => {
-    try {
-      await supabase.auth.signOut();
-      toast.success("Sesión cerrada");
-      navigate("/auth");
-    } catch (err: unknown) {
-      console.error(err);
-      toast.error("Error al cerrar sesión");
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "active":
-        return "text-green-600 bg-green-100";
-      case "completed":
-        return "text-blue-600 bg-blue-100";
-      case "pending":
-        return "text-yellow-600 bg-yellow-100";
-      default:
-        return "text-gray-600 bg-gray-100";
-    }
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "active":
-        return "En curso";
-      case "completed":
-        return "Completado";
-      case "pending":
-        return "Pendiente";
-      case "cancelled":
-        return "Cancelado";
-      default:
-        return status;
     }
   };
 
@@ -206,25 +163,21 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20">
       {/* Navigation */}
-      <nav className="border-b bg-card">
+      <nav className="border-b bg-card sticky top-0 z-40">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <img src={iconLogo} alt="Doggy-Walking" className="h-6 w-6 rounded-sm" />
             <span className="text-xl font-bold">Doggy-Walking</span>
           </div>
-          <Button variant="ghost" size="sm" onClick={handleLogout}>
-            <LogOut className="h-4 w-4 mr-2" />
-            Salir
-          </Button>
         </div>
       </nav>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-6">
         {/* Welcome Section */}
-        <div className="mb-8 animate-slide-up">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">
+        <div className="mb-6 animate-slide-up">
+          <h1 className="text-2xl md:text-3xl font-bold mb-1">
             ¡Hola buen día!
           </h1>
           <p className="text-muted-foreground">
@@ -232,10 +185,32 @@ const Dashboard = () => {
           </p>
         </div>
 
-        {/* Quick Actions */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+        {/* No Walker Affiliated Message */}
+        {!isAffiliated && (
+          <Card className="mb-6 animate-fade-in border-primary/20 bg-primary/5">
+            <CardHeader>
+              <CardTitle className="text-lg">Aún no tienes un paseador</CardTitle>
+              <CardDescription>
+                Conecta con un paseador escaneando su QR o busca uno disponible
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col sm:flex-row gap-3">
+              <Button onClick={() => navigate("/scan-qr")} className="flex-1">
+                <QrCode className="h-4 w-4 mr-2" />
+                Escanear QR
+              </Button>
+              <Button variant="outline" onClick={() => navigate("/discover")} className="flex-1">
+                <Search className="h-4 w-4 mr-2" />
+                Buscar Paseadores
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Quick Actions - Only if affiliated */}
+        {isAffiliated && (
           <Card
-            className="cursor-pointer hover:shadow-lg transition-all animate-scale-in border-border/50"
+            className="cursor-pointer hover:shadow-lg transition-all animate-scale-in border-border/50 mb-6"
             onClick={() => navigate("/scan-qr")}
           >
             <CardHeader>
@@ -246,68 +221,49 @@ const Dashboard = () => {
               <CardDescription>
                 Iniciar un paseo
               </CardDescription>
-              {isAffiliated && (
-                <div className="mt-2 flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
-                  <div className="w-2 h-2 bg-green-600 dark:bg-green-400 rounded-full animate-pulse"></div>
-                  Conectado con tu paseador
-                </div>
-              )}
+              <div className="mt-2 flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
+                <div className="w-2 h-2 bg-green-600 dark:bg-green-400 rounded-full animate-pulse"></div>
+                Conectado con tu paseador
+              </div>
             </CardHeader>
           </Card>
-
-          {/* <Card
-            className="cursor-pointer hover:shadow-lg transition-all animate-scale-in border-border/50"
-            style={{ animationDelay: "0.1s" }}
-            onClick={() => navigate("/my-walks")}
-          >
-            <CardHeader>
-              <div className="w-12 h-12 bg-secondary/10 rounded-xl flex items-center justify-center mb-2">
-                <MapPin className="h-6 w-6 text-secondary" />
-              </div>
-              <CardTitle>Mis Paseos</CardTitle>
-              <CardDescription>
-                {walks.length} registrados
-              </CardDescription>
-            </CardHeader>
-          </Card> */}
-          
-        </div>
+        )}
 
         {/* Real-time Tracking Map - Always show if affiliated */}
-          {isAffiliated && (
-            <Card className="animate-fade-in border-border/50 mb-6">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MapPin className="h-5 w-5 text-primary" />
-                  Ubicación en Tiempo Real
-                </CardTitle>
-                <CardDescription>
-                  Seguimiento de la ubicación del administrador
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="relative">
-                <Suspense fallback={<div className="h-[400px] w-full rounded-lg bg-muted animate-pulse" />}>
-                  <AdminTrackingMap
-                    adminId={affiliatedAdminId}
-                    onLocationUpdate={setHasAdminLocation}
-                  />
-                </Suspense>
-                {!hasActiveWalk && !hasAdminLocation && (
-                  <div className="absolute inset-0 backdrop-blur-sm bg-background/60 rounded-lg flex items-center justify-center">
-                    <div className="text-center space-y-2">
-                      <MapPin className="h-12 w-12 mx-auto text-muted-foreground opacity-50" />
-                      <p className="text-lg font-medium text-foreground">
-                        No hay paseo activo
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        El mapa se activará cuando comience un paseo
-                      </p>
-                    </div>
+        {isAffiliated && (
+          <Card className="animate-fade-in border-border/50 mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MapPin className="h-5 w-5 text-primary" />
+                Ubicación en Tiempo Real
+              </CardTitle>
+              <CardDescription>
+                Seguimiento de la ubicación del paseador
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="relative">
+              <Suspense fallback={<div className="h-[400px] w-full rounded-lg bg-muted animate-pulse" />}>
+                <AdminTrackingMap
+                  adminId={affiliatedAdminId}
+                  onLocationUpdate={setHasAdminLocation}
+                />
+              </Suspense>
+              {!hasActiveWalk && !hasAdminLocation && (
+                <div className="absolute inset-0 backdrop-blur-sm bg-background/60 rounded-lg flex items-center justify-center">
+                  <div className="text-center space-y-2">
+                    <MapPin className="h-12 w-12 mx-auto text-muted-foreground opacity-50" />
+                    <p className="text-lg font-medium text-foreground">
+                      No hay paseo activo
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      El mapa se activará cuando comience un paseo
+                    </p>
                   </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         {/* How It Works Card */}
         <Dialog>
@@ -384,81 +340,10 @@ const Dashboard = () => {
           </DialogContent>
         </Dialog>
 
-        <Card
-          className="cursor-pointer hover:shadow-lg transition-all animate-scale-in border-border/50 mb-8"
-          style={{ animationDelay: "0.15s" }}
-          onClick={() => navigate("/profile")}
-        >
-          <CardHeader>
-            <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-2">
-              <UserIcon className="h-6 w-6 text-primary" />
-            </div>
-            <CardTitle>Mi Perfil</CardTitle>
-            <CardDescription>
-              Configuración
-            </CardDescription>
-          </CardHeader>
-        </Card>
-
-
-
-        {/* Recent Walks */}
-        {/* <Card className="animate-fade-in border-border/50">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Clock className="h-5 w-5" />
-              Paseos Recientes
-            </CardTitle>
-            <CardDescription>
-              Historial de los últimos paseos de tu mascota
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {walks.length === 0 ? (
-              <div className="text-center py-12 text-muted-foreground">
-                <MapPin className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>No hay paseos registrados aún</p>
-                <p className="text-sm mt-2">Escanea un código QR para comenzar</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {walks.map((walk) => (
-                  <div
-                    key={walk.id}
-                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
-                    onClick={() => walk.status === "active" && navigate(`/walk/${walk.id}`)}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                        <MapPin className="h-5 w-5 text-primary" />
-                      </div>
-                      <div>
-                        <p className="font-medium">{walk.dog_name}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {new Date(walk.start_time).toLocaleDateString("es-ES", {
-                            day: "numeric",
-                            month: "short",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
-                        </p>
-                      </div>
-                    </div>
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                        walk.status
-                      )}`}
-                    >
-                      {getStatusText(walk.status)}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card> */}
         <a href='https://www.avskallet.com/' className='mt-4 text-center text-sm text-blue-500 flex justify-center items-center cursor-pointer'>Hecho con <Heart className="inline-block w-4 h-4 mx-1" /> por av-skallet solutions</a>
       </div>
+
+      <BottomNav />
     </div>
   );
 };

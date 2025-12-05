@@ -4,62 +4,54 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import WhatsAppButton from "@/components/WhatsAppButton";
+import { ThemeProvider } from "next-themes";
+import Index from "./pages/Index";
+import Auth from "./pages/Auth";
+import Dashboard from "./pages/Dashboard";
+import ScanQR from "./pages/ScanQR";
+import GenerateQR from "./pages/GenerateQR";
+import WalkTracking from "./pages/WalkTracking";
+import MyWalks from "./pages/MyWalks";
+import NotFound from "./pages/NotFound";
+import Profile from "./pages/Profile";
+import ResetPassword from "./pages/ResetPassword";
+import WalkerDashboard from "./pages/WalkerDashboard";
+import Discover from "./pages/Discover";
+import Settings from "./pages/Settings";
+import MyRequests from "./pages/MyRequests";
+import WalkerRequests from "./pages/WalkerRequests";
+import WhatsAppButton from "./components/WhatsAppButton";
 
-const Auth = lazy(() => import("./pages/Auth"));
-const ResetPassword = lazy(() => import("./pages/ResetPassword"));
-const Dashboard = lazy(() => import("./pages/Dashboard"));
-const WalkerDashboard = lazy(() => import("./pages/WalkerDashboard"));
-const WalkTracking = lazy(() => import("./pages/WalkTracking"));
-const Profile = lazy(() => import("./pages/Profile"));
-const MyWalks = lazy(() => import("./pages/MyWalks"));
-const ScanQR = lazy(() => import("./pages/ScanQR"));
-const GenerateQR = lazy(() => import("./pages/GenerateQR"));
-const NotFound = lazy(() => import("./pages/NotFound"));
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
-      gcTime: 1000 * 60 * 10, // 10 minutes
-      refetchOnWindowFocus: false,
-      retry: 1,
-    },
-  },
-});
+const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Suspense fallback={
-          <div className="min-h-screen flex items-center justify-center bg-background">
-            <div className="text-center space-y-4">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto" />
-              <p className="text-muted-foreground">Cargando...</p>
-            </div>
-          </div>
-        }>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
           <Routes>
             <Route path="/" element={<Auth />} />
             <Route path="/auth" element={<Auth />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/walker-dashboard" element={<WalkerDashboard />} />
-            <Route path="/walk/:walkId" element={<WalkTracking />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/my-walks" element={<MyWalks />} />
+            <Route path="/discover" element={<Discover />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/my-requests" element={<MyRequests />} />
             <Route path="/scan-qr" element={<ScanQR />} />
             <Route path="/generate-qr" element={<GenerateQR />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="/walk/:walkId" element={<WalkTracking />} />
+            <Route path="/my-walks" element={<MyWalks />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/walker-dashboard" element={<WalkerDashboard />} />
+            <Route path="/walker-requests" element={<WalkerRequests />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <WhatsAppButton />
-        </Suspense>
-      </BrowserRouter>
-    </TooltipProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 

@@ -229,6 +229,93 @@ export type Database = {
         }
         Relationships: []
       }
+      walk_requests: {
+        Row: {
+          client_id: string
+          created_at: string | null
+          duration_minutes: number | null
+          id: string
+          number_of_dogs: number | null
+          requested_date: string
+          requested_time: string
+          response_notes: string | null
+          special_notes: string | null
+          status: string | null
+          updated_at: string | null
+          walker_id: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string | null
+          duration_minutes?: number | null
+          id?: string
+          number_of_dogs?: number | null
+          requested_date: string
+          requested_time: string
+          response_notes?: string | null
+          special_notes?: string | null
+          status?: string | null
+          updated_at?: string | null
+          walker_id: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string | null
+          duration_minutes?: number | null
+          id?: string
+          number_of_dogs?: number | null
+          requested_date?: string
+          requested_time?: string
+          response_notes?: string | null
+          special_notes?: string | null
+          status?: string | null
+          updated_at?: string | null
+          walker_id?: string
+        }
+        Relationships: []
+      }
+      walker_profiles: {
+        Row: {
+          bio: string | null
+          city: string | null
+          created_at: string | null
+          hourly_rate: number | null
+          id: string
+          is_available: boolean | null
+          service_radius: number | null
+          specialties: string[] | null
+          state: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          bio?: string | null
+          city?: string | null
+          created_at?: string | null
+          hourly_rate?: number | null
+          id?: string
+          is_available?: boolean | null
+          service_radius?: number | null
+          specialties?: string[] | null
+          state?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          bio?: string | null
+          city?: string | null
+          created_at?: string | null
+          hourly_rate?: number | null
+          id?: string
+          is_available?: boolean | null
+          service_radius?: number | null
+          specialties?: string[] | null
+          state?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       walks: {
         Row: {
           client_id: string
