@@ -2,12 +2,11 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { User } from '@supabase/supabase-js';
 
-export type AppRole = 'admin' | 'user' | 'moderator';
+export type AppRole = 'walker' | 'user';
 
 interface UseUserRoleReturn {
   user: User | null;
   role: AppRole | null;
-  isAdmin: boolean;
   isWalker: boolean;
   loading: boolean;
   checkRole: () => Promise<void>;
@@ -73,8 +72,7 @@ export const useUserRole = (): UseUserRoleReturn => {
   return {
     user,
     role,
-    isAdmin: role === 'admin',
-    isWalker: role === 'admin', // In this system, admins are walkers
+    isWalker: role === 'walker',
     loading,
     checkRole
   };

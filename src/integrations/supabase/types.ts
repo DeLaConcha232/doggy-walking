@@ -89,6 +89,35 @@ export type Database = {
         }
         Relationships: []
       }
+      group_members: {
+        Row: {
+          added_at: string | null
+          client_id: string
+          group_id: string
+          id: string
+        }
+        Insert: {
+          added_at?: string | null
+          client_id: string
+          group_id: string
+          id?: string
+        }
+        Update: {
+          added_at?: string | null
+          client_id?: string
+          group_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_members_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "walker_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       locations: {
         Row: {
           created_at: string | null
@@ -208,6 +237,48 @@ export type Database = {
           },
         ]
       }
+      subscription_plans: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          display_name: string
+          features: Json | null
+          id: string
+          is_active: boolean | null
+          max_clients: number
+          min_clients: number
+          name: string
+          sort_order: number
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          display_name: string
+          features?: Json | null
+          id?: string
+          is_active?: boolean | null
+          max_clients: number
+          min_clients?: number
+          name: string
+          sort_order?: number
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          display_name?: string
+          features?: Json | null
+          id?: string
+          is_active?: boolean | null
+          max_clients?: number
+          min_clients?: number
+          name?: string
+          sort_order?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string | null
@@ -228,6 +299,51 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      walk_participants: {
+        Row: {
+          can_view_location: boolean | null
+          client_id: string
+          created_at: string | null
+          group_id: string | null
+          id: string
+          notified_at: string | null
+          walk_id: string
+        }
+        Insert: {
+          can_view_location?: boolean | null
+          client_id: string
+          created_at?: string | null
+          group_id?: string | null
+          id?: string
+          notified_at?: string | null
+          walk_id: string
+        }
+        Update: {
+          can_view_location?: boolean | null
+          client_id?: string
+          created_at?: string | null
+          group_id?: string | null
+          id?: string
+          notified_at?: string | null
+          walk_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "walk_participants_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "walker_groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "walk_participants_walk_id_fkey"
+            columns: ["walk_id"]
+            isOneToOne: false
+            referencedRelation: "walks"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       walk_requests: {
         Row: {
@@ -269,6 +385,39 @@ export type Database = {
           response_notes?: string | null
           special_notes?: string | null
           status?: string | null
+          updated_at?: string | null
+          walker_id?: string
+        }
+        Relationships: []
+      }
+      walker_groups: {
+        Row: {
+          color: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          updated_at: string | null
+          walker_id: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          updated_at?: string | null
+          walker_id: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
           updated_at?: string | null
           walker_id?: string
         }
@@ -316,12 +465,57 @@ export type Database = {
         }
         Relationships: []
       }
+      walker_subscriptions: {
+        Row: {
+          assigned_at: string | null
+          assigned_by: string | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          notes: string | null
+          plan_id: string
+          updated_at: string | null
+          walker_id: string
+        }
+        Insert: {
+          assigned_at?: string | null
+          assigned_by?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          notes?: string | null
+          plan_id: string
+          updated_at?: string | null
+          walker_id: string
+        }
+        Update: {
+          assigned_at?: string | null
+          assigned_by?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          notes?: string | null
+          plan_id?: string
+          updated_at?: string | null
+          walker_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "walker_subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       walks: {
         Row: {
           client_id: string
           created_at: string | null
           dog_name: string
           end_time: string | null
+          group_id: string | null
           id: string
           notes: string | null
           start_time: string | null
@@ -334,6 +528,7 @@ export type Database = {
           created_at?: string | null
           dog_name: string
           end_time?: string | null
+          group_id?: string | null
           id?: string
           notes?: string | null
           start_time?: string | null
@@ -346,6 +541,7 @@ export type Database = {
           created_at?: string | null
           dog_name?: string
           end_time?: string | null
+          group_id?: string | null
           id?: string
           notes?: string | null
           start_time?: string | null
@@ -359,6 +555,13 @@ export type Database = {
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "walks_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "walker_groups"
             referencedColumns: ["id"]
           },
           {
@@ -384,6 +587,14 @@ export type Database = {
           lng: number
         }[]
       }
+      get_walker_client_count: {
+        Args: { walker_user_id: string }
+        Returns: number
+      }
+      get_walker_client_limit: {
+        Args: { walker_user_id: string }
+        Returns: number
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -393,7 +604,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "user"
+      app_role: "walker" | "user"
       walk_status: "pending" | "active" | "completed" | "cancelled"
     }
     CompositeTypes: {
@@ -522,7 +733,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "user"],
+      app_role: ["walker", "user"],
       walk_status: ["pending", "active", "completed", "cancelled"],
     },
   },

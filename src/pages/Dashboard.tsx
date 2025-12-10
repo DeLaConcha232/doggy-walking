@@ -47,7 +47,7 @@ const Dashboard = () => {
         .eq('user_id', session.user.id)
         .maybeSingle();
         
-      if (roleData?.role === 'admin') {
+      if (roleData?.role === 'walker') {
         navigate("/walker-dashboard");
         return;
       }

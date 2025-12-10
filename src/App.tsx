@@ -20,6 +20,7 @@ import Discover from "./pages/Discover";
 import Settings from "./pages/Settings";
 import MyRequests from "./pages/MyRequests";
 import WalkerRequests from "./pages/WalkerRequests";
+import MyWalkers from "./pages/MyWalkers";
 import WhatsAppButton from "./components/WhatsAppButton";
 
 const queryClient = new QueryClient();
@@ -38,6 +39,7 @@ const App = () => (
             <Route path="/discover" element={<Discover />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/my-requests" element={<MyRequests />} />
+            <Route path="/my-walkers" element={<MyWalkers />} />
             <Route path="/scan-qr" element={<ScanQR />} />
             <Route path="/generate-qr" element={<GenerateQR />} />
             <Route path="/walk/:walkId" element={<WalkTracking />} />
