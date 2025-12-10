@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { LogOut, Users, Loader2, Heart, Inbox, Settings2 } from "lucide-react";
+import { LogOut, Users, Loader2, Heart, Inbox } from "lucide-react";
 import { toast } from "sonner";
 import { useUserRole } from "@/hooks/useUserRole";
 import WalkerQRDisplay from "@/components/walker/WalkerQRDisplay";
@@ -11,6 +11,8 @@ import WalkerMetrics from "@/components/walker/WalkerMetrics";
 import WalkerClients from "@/components/walker/WalkerClients";
 import WalkerLocationTracker from "@/components/walker/WalkerLocationTracker";
 import WalkerProfileSetup from "@/components/walker/WalkerProfileSetup";
+import WalkerPlanBadge from "@/components/walker/WalkerPlanBadge";
+import WalkerGroups from "@/components/walker/WalkerGroups";
 import iconLogo from '/icon-192.png';
 
 interface WalkMetrics {
@@ -177,6 +179,7 @@ const WalkerDashboard = () => {
             <span className="text-xl font-bold">Doggy-Walking</span>
             <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">Paseador</span>
           </div>
+          {user && <WalkerPlanBadge walkerId={user.id} />}
           <Button variant="ghost" size="sm" onClick={handleLogout}>
             <LogOut className="h-4 w-4 mr-2" />
             Salir
@@ -238,6 +241,11 @@ const WalkerDashboard = () => {
 
         {/* Clients */}
         <WalkerClients userId={user?.id || ''} />
+
+        {/* Groups */}
+        <div className="mt-6">
+          <WalkerGroups walkerId={user?.id || ''} />
+        </div>
 
         {/* Walker Profile Setup */}
         <div className="mt-6">

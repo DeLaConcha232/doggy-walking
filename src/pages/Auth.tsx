@@ -16,7 +16,7 @@ const authSchema = z.object({
   password: z.string().min(6, "Mínimo 6 caracteres").max(100),
   name: z.string().min(2, "Mínimo 2 caracteres").max(100).optional(),
   phone: z.string().max(20).optional(),
-  role: z.enum(["user", "admin"]).optional(),
+  role: z.enum(["user", "walker"]).optional(),
 });
 
 const Auth = () => {
@@ -29,7 +29,7 @@ const Auth = () => {
     password: "",
     name: "",
     phone: "",
-    role: "user" as "user" | "admin",
+    role: "user" as "user" | "walker",
   });
   const navigate = useNavigate();
 
@@ -48,7 +48,7 @@ const Auth = () => {
         return;
       }
 
-      if (roleData?.role === 'admin') {
+      if (roleData?.role === 'walker') {
         navigate("/walker-dashboard");
       } else {
         navigate("/dashboard");
@@ -140,12 +140,26 @@ const Auth = () => {
             console.error('Error assigning role:', roleError);
           }
 
-          // If walker, create walker_profile placeholder
-          if (formData.role === 'admin') {
+          // If walker, create walker_profile placeholder and assign free plan
+          if (formData.role === 'walker') {
             await supabase.from('walker_profiles').insert({
               user_id: authData.user.id,
               is_available: false,
             });
+
+            // Assign free plan to new walker
+            const { data: freePlan } = await supabase
+              .from('subscription_plans')
+              .select('id')
+              .eq('name', 'free')
+              .single();
+
+            if (freePlan) {
+              await supabase.from('walker_subscriptions').insert({
+                walker_id: authData.user.id,
+                plan_id: freePlan.id
+              });
+            }
           }
         }
 
@@ -197,9 +211,9 @@ const Auth = () => {
                 {/* Role Selection */}
                 <div className="space-y-3">
                   <Label>Tipo de cuenta</Label>
-                  <RadioGroup
+                <RadioGroup
                     value={formData.role}
-                    onValueChange={(value) => setFormData({ ...formData, role: value as "user" | "admin" })}
+                    onValueChange={(value) => setFormData({ ...formData, role: value as "user" | "walker" })}
                     className="grid grid-cols-2 gap-4"
                   >
                     <div>
@@ -221,12 +235,12 @@ const Auth = () => {
                     </div>
                     <div>
                       <RadioGroupItem
-                        value="admin"
-                        id="admin"
+                        value="walker"
+                        id="walker"
                         className="peer sr-only"
                       />
                       <Label
-                        htmlFor="admin"
+                        htmlFor="walker"
                         className="flex flex-col items-center justify-between rounded-lg border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
                       >
                         <Dog className="h-6 w-6 mb-2" />

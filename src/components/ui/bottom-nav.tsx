@@ -1,4 +1,4 @@
-import { Home, Search, Settings } from "lucide-react";
+import { Home, Search, Settings, Users } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
@@ -8,6 +8,7 @@ const BottomNav = () => {
 
   const navItems = [
     { icon: Home, label: "Inicio", path: "/dashboard" },
+    { icon: Users, label: "Paseadores", path: "/my-walkers" },
     { icon: Search, label: "Descubrir", path: "/discover" },
     { icon: Settings, label: "Ajustes", path: "/settings" },
   ];
